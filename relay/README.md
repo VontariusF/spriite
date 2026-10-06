@@ -71,7 +71,11 @@ echo 'VITE_SPRIITE_RELAY=https://<your-relay>' > .env.production.local
 npm run pack
 ```
 
-The value must be a bare `https://` origin (no path). `npm run pack` bakes it
+The value is an `https://` URL: a bare origin, or one with a path prefix if
+the relay is mounted under a path (for example
+`tailscale funnel --bg --set-path /spriite-relay http://127.0.0.1:8787`
+gives `https://<machine>.<tailnet>.ts.net/spriite-relay`). The allowlist
+entry is the origin. `npm run pack` bakes it
 into the build and swaps the direct Factory and Cursor entries in the packed
 network allowlist for your relay. The source `app.json` isn't edited, and
 `.env.production.local` is git-ignored.

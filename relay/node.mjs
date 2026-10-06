@@ -3,6 +3,9 @@
  *
  *   PORT=8787 ALLOWED_ORIGINS=* node relay/node.mjs
  *
+ * Binds to 127.0.0.1 by default (set HOST to change it); the tunnel is the
+ * only public entry point.
+ *
  * Installed plugins need HTTPS, so expose it through a tunnel you control
  * (for example `tailscale funnel 8787` or `cloudflared tunnel`) and build
  * Spriite with VITE_SPRIITE_RELAY set to that https origin.
@@ -12,6 +15,7 @@ import { Readable } from 'node:stream'
 import { handle } from './worker.js'
 
 const port = Number(process.env.PORT ?? 8787)
+const host = process.env.HOST ?? '127.0.0.1'
 const env = { ALLOWED_ORIGINS: process.env.ALLOWED_ORIGINS ?? '*' }
 
 createServer(async (req, res) => {
@@ -35,6 +39,6 @@ createServer(async (req, res) => {
     res.writeHead(500, { 'Content-Type': 'text/plain' })
     res.end('relay error')
   }
-}).listen(port, () => {
-  console.log(`spriite relay listening on :${port}`)
+}).listen(port, host, () => {
+  console.log(`spriite relay listening on ${host}:${port}`)
 })

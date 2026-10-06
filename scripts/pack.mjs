@@ -23,10 +23,10 @@ if (raw) {
   let origin
   try {
     const u = new URL(raw)
-    if (u.protocol !== 'https:' || (u.pathname !== '/' && u.pathname !== '')) throw new Error()
+    if (u.protocol !== 'https:' || u.search || u.hash) throw new Error()
     origin = u.origin
   } catch {
-    console.error(`VITE_SPRIITE_RELAY must be a bare https origin (got "${raw}")`)
+    console.error(`VITE_SPRIITE_RELAY must be an https URL with no query (got "${raw}")`)
     process.exit(1)
   }
   const net = manifest.permissions.find((p) => p.name === 'network')
