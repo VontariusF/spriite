@@ -2,7 +2,7 @@
   "package_id": "com.spriite.app",
   "edition": "202601",
   "name": "Spriite",
-  "version": "0.2.1",
+  "version": "0.2.2",
   "min_app_version": "2.2.10",
   "min_sdk_version": "0.0.16",
   "entrypoint": "index.html",

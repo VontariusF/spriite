@@ -1,7 +1,7 @@
 {
   "name": "spriite",
   "private": true,
-  "version": "0.2.1",
+  "version": "0.2.2",
   "description": "Voice-first companion for running an AI software factory (Factory, Cursor) from HUD smart glasses. Bring your own keys; self-hosted relay.",
   "license": "Apache-2.0",
   "type": "module",
