@@ -1,0 +1,7 @@
+name = "spriite-relay"
+main = "worker.js"
+compatibility_date = "2026-09-01"
+
+# Optional: restrict which origins may read relayed responses.
+# [vars]
+# ALLOWED_ORIGINS = "*"

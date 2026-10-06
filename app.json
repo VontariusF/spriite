@@ -1,0 +1,27 @@
+{
+  "package_id": "com.spriite.app",
+  "edition": "202601",
+  "name": "Spriite",
+  "version": "0.2.0",
+  "min_app_version": "2.2.10",
+  "min_sdk_version": "0.0.16",
+  "entrypoint": "index.html",
+  "permissions": [
+    {
+      "name": "g2-microphone",
+      "desc": "Tap-to-talk voice capture and spoken commands through the glasses mic."
+    },
+    {
+      "name": "network",
+      "desc": "Voice transcription and, with connected accounts, your GitHub, Factory, and Cursor clouds.",
+      "whitelist": [
+        "https://api.elevenlabs.io",
+        "wss://api.elevenlabs.io",
+        "https://api.github.com",
+        "https://api.factory.ai",
+        "https://api.cursor.com"
+      ]
+    }
+  ],
+  "supported_languages": ["en"]
+}
