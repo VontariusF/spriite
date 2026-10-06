@@ -10,7 +10,7 @@ npm run test:real      # real engine against fake workers (plan, split, review, 
 npm run sim:offline    # simulator against a fake Factory whose computer is offline (also sim:blocked, sim:newrepo)
 npm run walk:real -- 9899 offline   # drives that variant end to end, saves shots/r-*
 npm run check:copy     # every glasses string fits its pixel budget
-npm run pack           # copy check + build + .ehpk
+npm run pack           # copy check + build + .ehpk (needs your relay; see SETUP.md step 3)
 npm run relay          # run the relay with Node (for testing it, or for self-hosting)
 ```
 

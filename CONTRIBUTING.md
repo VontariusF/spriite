@@ -20,7 +20,7 @@ npx tsc --noEmit       # types
 npm run check:copy     # every glasses string fits its pixel budget
 npm run test:real      # real engine against fake workers (no credits spent)
 npm run walkthrough    # with dev + sim running: drives the demo story
-npm run pack           # build + package
+npm run pack           # build + package (needs a relay; npm run pack -- --no-relay for a demo-only build)
 ```
 
 All of these must pass. Keep changes focused, match the surrounding style,

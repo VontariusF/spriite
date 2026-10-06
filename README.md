@@ -59,14 +59,15 @@ Consequential voice commands show a readback before they run. The phone also lis
 
 ## Get started
 
-Spriite is available as a **self-built Even Hub app**. It is not in the glasses app store yet.
+Spriite is **bring your own relay**: you build your own copy against a relay you host and install it from your own Even Hub developer account. There is no store listing and no shared relay, so your keys only pass through infrastructure you control. (The Even app lets a build reach only the exact addresses packed into it, so one build can't serve everyone's relay.)
 
 | You need | For |
 |---|---|
 | **Even Realities G2** | The HUD. The R1 ring is optional; temple controls also work. |
 | **Factory API key + online Droid Computer** | Planning, review, and Factory workers. Required even when Cursor builds. |
 | **GitHub repository** | Branches and pull requests. GitHub credentials must be available to your workers. |
-| **Your own HTTPS relay** | Installed builds reach Factory and Cursor through a small relay you host. |
+| **Your own HTTPS relay** | Installed builds reach Factory and Cursor through a small relay you host. Your build reaches only your relay. |
+| **Even Hub developer account** | You upload your build to your own project there. |
 | **ElevenLabs key** | Recommended for live speech-to-text. |
 | **Cursor API key** | Optional cloud workers. |
 | **GitHub token** | Optional repository picker and new-repository creation. |

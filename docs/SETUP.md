@@ -39,13 +39,27 @@ tunnel); see [`relay/README.md`](../relay/README.md).
 
 ### 3. Build Spriite against your relay
 
+In the [Even Hub developer portal](https://hub.evenrealities.com/hub),
+create a project for your copy and note its package id (for example
+`com.yourname.spriite`). Package ids are unique per developer account, so
+use your own. Then:
+
 ```bash
-echo 'VITE_SPRIITE_RELAY=https://spriite-relay.<you>.workers.dev' > .env.production.local
-npm run pack               # -> spriite.ehpk, with your relay in the network whitelist
+cp .env.example .env.production.local   # git-ignored
+# edit it: VITE_SPRIITE_RELAY=<your relay URL>, SPRIITE_PACKAGE_ID=<your package id>
+npm run pack               # -> spriite.ehpk for your project, allowing only your relay
 ```
 
 The relay address is baked into your build and added to the app's network
-allowlist. `app.json` itself is never edited.
+allowlist, and your package id replaces the default. `app.json` itself is
+never edited. The Even app checks that allowlist before any request leaves
+the phone and accepts exact addresses only, which is why each person builds
+their own copy: there's no way to ship one build that reaches everyone's
+relay. If you move your relay, rebuild and upload again.
+
+`npm run pack` refuses to build without a relay, because such a build can't
+reach Factory or Cursor on a phone. `npm run pack -- --no-relay` makes a
+demo-only build.
 
 ### 4. Install it on your glasses
 

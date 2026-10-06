@@ -58,6 +58,18 @@ Installed apps need HTTPS, so use the tunnel's `https://` address. If the
 machine sleeps or goes offline, Factory and Cursor calls fail until it's
 back.
 
+To keep the relay off the public internet entirely, serve it only on your
+Tailscale network (no Funnel) and keep Tailscale connected on your phone:
+
+```bash
+tailscale serve --bg --https=443 --set-path /spriite-relay http://127.0.0.1:8787
+# relay URL: https://<machine>.<tailnet>.ts.net/spriite-relay
+```
+
+Only devices on your tailnet can reach it, and nothing about it resolves in
+public DNS. The trade-off: Spriite can't reach Factory or Cursor while the
+phone is off the tailnet.
+
 ## Check it
 
 ```bash
@@ -71,7 +83,7 @@ Factory and came back readable by a browser.
 ## Build Spriite against it
 
 ```bash
-echo 'VITE_SPRIITE_RELAY=https://spriite-relay.<you>.workers.dev' > .env.production.local
+cp .env.example .env.production.local   # then set VITE_SPRIITE_RELAY and SPRIITE_PACKAGE_ID
 npm run pack
 ```
 
@@ -80,6 +92,10 @@ Factory and Cursor entries in the packed network allowlist for your relay's
 origin. The source `app.json` isn't edited, and `.env.production.local` is
 git-ignored. A relay mounted under a path (for example
 `https://example.com/spriite-relay`) works too.
+
+The Even app enforces that allowlist on the phone and accepts exact
+origins only, so a build reaches exactly one relay: yours. Moving the relay
+means packing and uploading again.
 
 ## Options
 
