@@ -82,22 +82,19 @@ your requests and adds those headers. It's under 150 lines in
 
 Because you run it, your keys never pass through anyone else's server.
 
-**Cloudflare Worker** (free tier, about two minutes):
+Deploy it as a Cloudflare Worker. It's free, always on, and takes about
+two minutes with a free Cloudflare account:
 
 ```bash
 cd relay
+npx wrangler login         # first time only; opens Cloudflare in your browser
 npx wrangler deploy        # prints https://spriite-relay.<you>.workers.dev
 curl https://spriite-relay.<you>.workers.dev/health   # -> spriite relay ok
 ```
 
-**Or your own machine**, behind an HTTPS tunnel you control:
-
-```bash
-npm run relay              # listens on :8787
-tailscale funnel 8787      # or: cloudflared tunnel --url http://localhost:8787
-```
-
-Details and options are in [`relay/README.md`](relay/README.md).
+That URL is your relay. Other hosts work too (any platform that runs a
+standard `fetch` handler, or a machine you keep online behind an HTTPS
+tunnel); see [`relay/README.md`](relay/README.md).
 
 ### 3. Build Spriite against your relay
 
@@ -199,7 +196,7 @@ npm run walkthrough    # drives the demo story in the simulator, saves shots/
 npm run test:real      # real engine against fake workers (plan, split, review, PR); no credits spent
 npm run check:copy     # every glasses string fits its pixel budget
 npm run pack           # copy check + build + .ehpk
-npm run relay          # run the relay locally
+npm run relay          # run the relay with Node (for testing it, or for self-hosting)
 ```
 
 Add `?fresh=1` to the dev URL to ignore saved state.
@@ -219,7 +216,7 @@ Add `?fresh=1` to the dev URL to ignore saved state.
 | `src/phone/`, `src/setup/` | Phone companion: Now and Setup tabs, shared theme |
 | `src/sprite/` | The pixel companion: layered frames and a sparse animator |
 | `src/bridge/`, `src/render/`, `src/input/`, `src/audio/` | Device adapter (Even Hub today) |
-| `relay/` | Self-hosted relay (Cloudflare Worker or Node) |
+| `relay/` | Your relay: a Cloudflare Worker (default) that also runs under Node |
 | `scripts/` | Packer, copy budget checker, sprite contact sheet, simulator walkthrough, engine test |
 
 ## Status

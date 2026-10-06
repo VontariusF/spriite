@@ -24,35 +24,39 @@ You host it yourself, so your keys never pass through anyone else's server.
 Your keys do pass through it in transit, which is why you should run it
 somewhere you control.
 
-## Deploy
+## Deploy (Cloudflare Worker)
 
-### Option A: Cloudflare Worker (free tier)
+This is the recommended setup: free, always on, HTTPS by default, and
+nothing to keep running yourself. You need a free Cloudflare account.
 
 ```bash
 cd relay
-npx wrangler login         # first time only
+npx wrangler login         # first time only; opens Cloudflare in your browser
 npx wrangler deploy        # prints https://spriite-relay.<you>.workers.dev
 ```
 
-The free tier allows 100,000 requests a day. Spriite polls active sessions
-every 3 to 5 seconds, so an hour of active work uses roughly 2,000 requests
-with one worker and up to about 6,000 with four in parallel.
+The printed URL is your relay. The free tier allows 100,000 requests a
+day. Spriite polls active sessions every 3 to 5 seconds, so an hour of
+active work uses roughly 2,000 requests with one worker and up to about
+6,000 with four in parallel.
 
-### Option B: your own machine
+## Other hosts (advanced)
+
+`worker.js` exports a standard `fetch(request, env)` handler, so it also
+runs on other platforms that support Web-standard handlers (Deno Deploy,
+Bun, Vercel Edge, Netlify Edge) with little or no change.
+
+You can also run it with Node 18+ (no dependencies) on a machine you keep
+online, behind an HTTPS tunnel you control:
 
 ```bash
-npm run relay              # or: PORT=8787 node relay/node.mjs (Node 18+, no dependencies)
-tailscale funnel 8787      # or: cloudflared tunnel --url http://localhost:8787
+PORT=8787 npm run relay    # listens on 127.0.0.1 only
+cloudflared tunnel --url http://127.0.0.1:8787   # or a Tailscale Funnel
 ```
 
-Installed apps need HTTPS, so use the tunnel's `https://` address. The
-machine has to be awake and online whenever you use Spriite.
-
-### Option C: anywhere else
-
-`worker.js` exports a standard `fetch(request, env)` handler, so it runs
-on any platform that supports Web-standard handlers (Deno Deploy, Bun,
-Vercel Edge, Netlify Edge) with little or no change.
+Installed apps need HTTPS, so use the tunnel's `https://` address. If the
+machine sleeps or goes offline, Factory and Cursor calls fail until it's
+back.
 
 ## Check it
 
@@ -67,18 +71,15 @@ Factory and came back readable by a browser.
 ## Build Spriite against it
 
 ```bash
-echo 'VITE_SPRIITE_RELAY=https://<your-relay>' > .env.production.local
+echo 'VITE_SPRIITE_RELAY=https://spriite-relay.<you>.workers.dev' > .env.production.local
 npm run pack
 ```
 
-The value is an `https://` URL: a bare origin, or one with a path prefix if
-the relay is mounted under a path (for example
-`tailscale funnel --bg --set-path /spriite-relay http://127.0.0.1:8787`
-gives `https://<machine>.<tailnet>.ts.net/spriite-relay`). The allowlist
-entry is the origin. `npm run pack` bakes it
-into the build and swaps the direct Factory and Cursor entries in the packed
-network allowlist for your relay. The source `app.json` isn't edited, and
-`.env.production.local` is git-ignored.
+`npm run pack` bakes the relay URL into the build and swaps the direct
+Factory and Cursor entries in the packed network allowlist for your relay's
+origin. The source `app.json` isn't edited, and `.env.production.local` is
+git-ignored. A relay mounted under a path (for example
+`https://example.com/spriite-relay`) works too.
 
 ## Options
 
@@ -86,5 +87,6 @@ network allowlist for your relay. The source `app.json` isn't edited, and
 |---|---|---|
 | `ALLOWED_ORIGINS` | `*` | Comma-separated origins allowed to read relayed responses. The glasses host decides the app's origin, so `*` is the safe default. |
 | `PORT` (Node only) | `8787` | Listen port. |
+| `HOST` (Node only) | `127.0.0.1` | Listen address. Keep it local and expose it through a tunnel. |
 
 For Cloudflare, set `ALLOWED_ORIGINS` under `[vars]` in `wrangler.toml`.
