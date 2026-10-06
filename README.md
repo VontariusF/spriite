@@ -55,6 +55,7 @@ simulated factory, so you can try Spriite with no accounts and no cost.
 | Piece | Required? | What it does |
 |---|---|---|
 | [Factory](https://app.factory.ai/settings/api-keys) API key | Required | The lead session plans, reviews, and asks you questions. Without Cursor, Factory sessions also do the building on your computer. |
+| A [Factory Droid Computer](https://docs.factory.com/droid-computers/overview.md), online | Required | Every Factory session Spriite starts runs on it, including the lead session, even when Cursor does the building. Your own machine with Remote Access on, or a Factory-managed cloud computer. See [step 5](#5-keep-a-factory-computer-online). |
 | A GitHub repository | Required | Where the work lands. Picked from a list on your phone; nobody types URLs. |
 | [ElevenLabs](https://elevenlabs.io/app/settings/api-keys) API key | Recommended | Live speech-to-text. Create it with speech-to-text access only and a spending cap. |
 | [Cursor](https://cursor.com/dashboard/api) API key | Optional | Cursor cloud agents as workers, in parallel with your machine. |
@@ -118,14 +119,48 @@ For Even Realities G2: upload `spriite.ehpk` to your project in the
   the same install path a store app uses, and it keeps running with your
   phone locked. Use this for daily use.
 
-### 5. Connect your accounts
+### 5. Keep a Factory computer online
+
+Factory runs every session on a **Droid Computer**, and Spriite needs one
+whenever it starts or continues a mission: the lead session that plans and
+reviews runs there, and so do Factory workers. Spriite uses the computer you
+pick in Setup if it's active, otherwise the first active computer in your
+account. You need one of these:
+
+- **Your own machine (Mac, Linux, or Windows).** It must be registered with
+  Factory and its Droid daemon must be connected with remote access. Either
+  open the Factory app on it and turn on **Settings → Droid Computers →
+  Remote Access** (it stays connected while the app is running), or run:
+
+  ```bash
+  droid daemon --remote-access   # registers the machine on first run
+  ```
+
+  No inbound ports are opened; the daemon connects out to Factory's relay.
+  The machine has to stay awake and online while you build, so run the
+  daemon as a login service (a launchd agent on macOS, a systemd service on
+  Linux) if you'll use Spriite away from it. Factory sessions on your
+  machine use the git credentials already configured there, so make sure
+  it can clone and push to your repository.
+- **A Factory-managed cloud computer.** Create one under **Settings → Droid
+  Computers → Create** in the Factory app. It pauses when idle and wakes
+  when a session targets it, and it gets GitHub access through your
+  Factory GitHub integration.
+
+Check what Factory sees with `droid computer list`. If the machine is listed
+but its daemon isn't connected, Spriite shows **Computer offline** on the
+glasses and explains why on the phone; start the daemon and tap **Retry**.
+If your account has no active computer at all, Spriite asks you to connect
+one before it starts.
+
+### 6. Connect your accounts
 
 Open Spriite's page in the phone app and go to **Setup**. A checklist walks
 you through Factory, repository, voice, Cursor, and GitHub. Each key is
 proven with one lightweight call when you save it, then stored only on your
 phone. Saves apply to the glasses immediately.
 
-### 6. Start a mission
+### 7. Start a mission
 
 On the glasses, pick **New build** and tap Talk, or type a goal in the
 phone's **Tell Spriite** box.
@@ -163,7 +198,10 @@ to open pull requests automatically or ask first).
 
 **When something fails,** Spriite says which service failed and why, on the
 glasses (`Service failed | Factory HTTP 401`) and in full on the phone.
-Nothing is acted on after a failure.
+Nothing is acted on after a failure. The most common one is
+`Computer offline | check Factory app`: Factory couldn't reach the Droid
+daemon on your computer (HTTP 503). Bring it back online
+([step 5](#5-keep-a-factory-computer-online)) and tap Retry.
 
 ## Supported glasses
 
@@ -194,6 +232,8 @@ npm run dev            # dev server with the Factory and Cursor proxy
 npm run sim            # Even G2 simulator, automation API on :9898
 npm run walkthrough    # drives the demo story in the simulator, saves shots/
 npm run test:real      # real engine against fake workers (plan, split, review, PR); no credits spent
+npm run sim:offline    # simulator against a fake Factory whose computer is offline (also sim:blocked, sim:newrepo)
+npm run walk:real -- 9899 offline   # drives that variant end to end, saves shots/r-*
 npm run check:copy     # every glasses string fits its pixel budget
 npm run pack           # copy check + build + .ehpk
 npm run relay          # run the relay with Node (for testing it, or for self-hosting)
