@@ -182,11 +182,26 @@ export function mountPhoneApp(
   })
   sayInput.enterKeyHint = 'send'
   const saySend = el('button', { className: 'btn', textContent: 'Send' })
+  // A goal can start in a brand-new repository (created through the saved
+  // GitHub token) instead of the chosen one. The name is optional: Spriite
+  // derives it from the goal.
+  const sayNewRepoCheck = el('input', { type: 'checkbox' })
+  const sayNewRepoName = el('input', {
+    type: 'text', placeholder: 'Repository name (optional)', autocomplete: 'off', spellcheck: false,
+  })
+  sayNewRepoName.style.display = 'none'
+  const sayNewRepoRow = el('label', { className: 'check' }, [sayNewRepoCheck, 'Start in a new repository'])
+  sayNewRepoCheck.onchange = () => {
+    sayNewRepoName.style.display = sayNewRepoCheck.checked ? 'block' : 'none'
+    renderComposer()
+  }
   const sayHelp = el('p', { className: 'small muted' })
   const sayNote = el('p', { className: 'msg muted' })
   const sayCard = el('section', { className: 'card stack' }, [
     el('div', { className: 'eyebrow', textContent: 'Tell Spriite' }),
     el('div', { className: 'composer' }, [sayInput, saySend]),
+    sayNewRepoRow,
+    sayNewRepoName,
     sayHelp,
     sayNote,
   ])
@@ -346,12 +361,21 @@ export function mountPhoneApp(
 
   const renderComposer = (): void => {
     const engine = deps.engine()
+    const goalMode = !engine.hasPendingDecision && engine.acceptsGoal()
+    sayNewRepoRow.style.display = goalMode ? '' : 'none'
+    sayNewRepoName.style.display = goalMode && sayNewRepoCheck.checked ? 'block' : 'none'
     if (engine.hasPendingDecision) {
       sayInput.placeholder = 'Answer Spriite'
       sayHelp.textContent = 'Spriite is waiting on your answer. Yes or no works, or reply in your own words.'
     } else if (engine.acceptsGoal()) {
-      sayInput.placeholder = 'What should we build?'
-      sayHelp.textContent = 'Describe a goal and Spriite starts a Factory build. It asks before spending credits.'
+      if (sayNewRepoCheck.checked) {
+        sayInput.placeholder = 'Goal for the new repository'
+        sayHelp.textContent =
+          'Spriite will create a private GitHub repository for this goal and build there. It needs a GitHub token (Setup tab).'
+      } else {
+        sayInput.placeholder = 'What should we build?'
+        sayHelp.textContent = 'Describe a goal and Spriite starts a Factory build. It asks before spending credits.'
+      }
     } else {
       sayInput.placeholder = 'Steer the build'
       sayHelp.textContent = 'Your message goes to the build that is running now.'
@@ -452,13 +476,34 @@ export function mountPhoneApp(
     const text = sayInput.value.trim()
     if (!text) return
     sayInput.value = ''
-    const went = deps.engine().say(text)
-    sayNote.className = went === 'none' ? 'msg err' : 'msg ok'
-    sayNote.textContent =
-      went === 'goal' ? 'Got it. Spriite is starting a Factory build to plan this.'
-      : went === 'decision' ? 'Answer sent.'
-      : went === 'steer' ? 'Sent. The reply will show on your glasses and in Activity.'
-      : 'Spriite cannot take a message right now. Start a build or answer its question first.'
+    const engine = deps.engine()
+    const asNewRepo =
+      sayNewRepoCheck.checked &&
+      sayNewRepoRow.style.display !== 'none' &&
+      engine instanceof RealOrchestrator
+    const went = asNewRepo
+      ? engine.sayNewRepo(text, sayNewRepoName.value.trim())
+      : engine.say(text)
+    if (asNewRepo) {
+      // One goal, one repository: the option never fires twice by accident.
+      sayNewRepoCheck.checked = false
+      sayNewRepoName.style.display = 'none'
+      sayNewRepoName.value = ''
+    }
+    if (went === 'goal' && asNewRepo && engine instanceof RealOrchestrator) {
+      const blocked = engine.snapshot().blockedStart
+      sayNote.className = blocked === 'github' ? 'msg err' : 'msg ok'
+      sayNote.textContent = blocked === 'github'
+        ? 'Spriite needs a GitHub token to create the repository. Add one on the Setup tab, and this build continues.'
+        : 'Got it. Spriite is creating a new repository for this goal, then planning.'
+    } else {
+      sayNote.className = went === 'none' ? 'msg err' : 'msg ok'
+      sayNote.textContent =
+        went === 'goal' ? 'Got it. Spriite is starting a Factory build to plan this.'
+        : went === 'decision' ? 'Answer sent.'
+        : went === 'steer' ? 'Sent. The reply will show on your glasses and in Activity.'
+        : 'Spriite cannot take a message right now. Start a build or answer its question first.'
+    }
     if (lastView) renderLive(lastView)
   }
   saySend.onclick = send

@@ -178,7 +178,9 @@ export function mountSetupPanel(
   // The glasses' connect prompts land here: open, scroll, and flash the step.
   window.addEventListener('spriite-connect', (ev) => {
     const detail = (ev as CustomEvent<string>).detail
-    if (detail === 'factory' || detail === 'repo' || detail === 'voice') open(detail, true)
+    if (detail === 'factory' || detail === 'repo' || detail === 'github' || detail === 'voice') {
+      open(detail, true)
+    }
   })
 
   // ---------------------------------------------------------- readiness
@@ -258,11 +260,18 @@ export function mountSetupPanel(
     show(fForm.status, 'Testing with Factory...', 'muted')
     try {
       const computers = await factoryComputers(key)
-      const active = computers.find((c) => c.status === 'active') ?? computers[0]
+      const active = computers.find((c) => c.status === 'active')
       failed.factory = false
       if (active) {
         await keys.setComputerId(active.id)
         show(fForm.status, `Connected. Builds run on your computer "${active.name}".`, 'ok')
+      } else if (computers.length > 0) {
+        // Only inactive computers: keep the saved pick (it may come back),
+        // never silently point builds at a machine that cannot run them.
+        const first = computers[0]
+        show(fForm.status,
+          `Connected, but your computer "${first.name}" is not active (${first.status}). It must be online to run builds.`,
+          'err')
       } else {
         show(fForm.status, 'Connected, but this account has no Droid Computer yet. Open the Factory app on your Mac, or add a cloud computer, so builds can run.', 'err')
       }
@@ -294,6 +303,10 @@ export function mountSetupPanel(
       'Create a key at ',
       link('app.factory.ai/settings/api-keys', 'https://app.factory.ai/settings/api-keys'),
       '.',
+    ]),
+    el('p', { className: 'small muted' }, [
+      'Builds reach that computer through its Droid daemon, so keep it online: leave the Factory app open on it with Settings \u2192 Droid Computers \u2192 Remote Access on, or run "droid daemon --remote-access" in a terminal. ',
+      'If builds fail with "could not reach the computer", that daemon is the thing to start.',
     ]),
     fForm.node,
   )

@@ -50,6 +50,7 @@ import {
   type FactoryMessage,
   type FactorySessionCard,
 } from './fapi'
+import { githubCreateRepo } from './github'
 
 export type RealPhase =
   | 'meet'
@@ -90,6 +91,22 @@ export interface RealJob {
   polling: boolean
 }
 
+/** What the fault card's Retry re-runs (poll faults have none: they resume). */
+export type FaultRetry =
+  | 'plan'
+  | 'repo'
+  | 'build'
+  | 'fix'
+  | 'integration'
+  | 'pr'
+  | 'verdict'
+  | 'summary'
+  | 'decision'
+  | 'steer'
+
+/** What a waiting start is blocked on (the panel save that fixes it resumes). */
+export type BlockedStart = 'factory' | 'repo' | 'computer' | 'github'
+
 export interface RealSnapshot {
   v: 1
   real: true
@@ -97,6 +114,14 @@ export interface RealSnapshot {
   goal: string
   capturedSec: number
   repoUrl: string
+  /**
+   * The repository this mission builds on, frozen when planning started (a
+   * panel save mid-mission never moves a live run). Empty on old snapshots,
+   * where the mission used the saved repository.
+   */
+  missionRepo: string
+  /** A start waiting on a missing piece; null while nothing waits. */
+  blockedStart: BlockedStart | null
   sessionId: string | null
   awaiting: 'plan' | 'verdict' | 'summary' | 'steer' | null
   workerPref: WorkerPref
@@ -130,9 +155,18 @@ export interface RealSnapshot {
   seenMessageIds: string[]
   messageCount: number
   faultKind: string | null
-  faultSource: 'factory' | 'cursor' | null
+  faultSource: 'factory' | 'cursor' | 'github' | null
   /** Raw failure reason (console/phone detail; the HUD keeps short copy). */
   faultDetail: string
+  /** Which step Retry re-runs on the fault card (null: polling resumes). */
+  faultRetry: FaultRetry | null
+  /** Job index for the fix/verdict retries. */
+  faultRetryIndex: number | null
+  /** Last texts sent to the lead (Retry re-sends them after a fault). */
+  lastSteer: string
+  lastDecision: string
+  /** A typed repository name waiting for its new-repo start. */
+  repoName: string
   seq: number
 }
 
@@ -148,6 +182,12 @@ export interface RealClients {
   /** The account's cloud builds (the home list), newest first. */
   listFactorySessions(): Promise<FactorySessionCard[]>
   listCursorAgents(): Promise<CursorAgentCard[]>
+  /**
+   * Create a repository for a mission that starts from scratch (bring-your-
+   * own GitHub token). The name is derived from the goal or typed on the
+   * phone; the repository is created private.
+   */
+  createRepo(name: string, isPrivate: boolean): Promise<{ url: string }>
   cursorAgent(promptText: string, repoUrl: string): Promise<{ agentId: string; runId: string | null }>
   cursorRun(agentId: string, promptText: string): Promise<{ runId: string }>
   cursorGet(agentId: string, runId: string): Promise<CursorRunState>
@@ -243,6 +283,19 @@ function milestoneStatusWord(status: RealMilestone['status']): string {
   return 'pending'
 }
 
+/**
+ * A fair repository name for a spoken goal: "Build a landing page for Acme!"
+ * -> "build-a-landing-page-for-acme". New-repo missions name themselves.
+ */
+function repoNameFromGoal(goal: string): string {
+  const slug = goal
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g, '-')
+    .replace(/^-+|-+$/g, '')
+    .slice(0, 48)
+  return slug || 'spriite-build'
+}
+
 export class RealOrchestrator implements FactoryEngine {
   private phase: RealPhase = 'meet'
   private transient: TransientState | null = null
@@ -276,6 +329,21 @@ export class RealOrchestrator implements FactoryEngine {
   private faultSource: RealSnapshot['faultSource'] = null
   /** The raw failure reason (e.g. "Factory HTTP 400 (computerId: ...)"). */
   private faultDetail = ''
+  /** The step Retry re-runs on the fault card; null lets polling resume. */
+  private faultRetry: FaultRetry | null = null
+  /** Job index for the fix/verdict retries. */
+  private faultRetryIndex: number | null = null
+  /** Last texts sent to the lead (Retry re-sends them after a fault). */
+  private lastSteer = ''
+  private lastDecision = ''
+  /**
+   * A start that is waiting on a missing piece (key, repository, computer).
+   * The configure() call that arrives with the piece resumes the start, so
+   * a save on the phone never leaves the glasses on a stale prompt.
+   */
+  private blockedStart: BlockedStart | null = null
+  /** A typed repository name waiting for its new-repo start. */
+  private repoName = ''
   private seq = 0
   private nextLeadPoll = 0
   private pollingLead = false
@@ -294,6 +362,8 @@ export class RealOrchestrator implements FactoryEngine {
   /** Config is mutable: the panel saves hot-apply through configure(). */
   private factoryKey: string
   private cursorKey: string
+  /** GitHub token (optional): mission-time repository creation. */
+  private githubToken: string
   private repoUrl: string
   private computerId: string
   private workerPref: WorkerPref
@@ -308,12 +378,15 @@ export class RealOrchestrator implements FactoryEngine {
    * computerId on every session create; without one the call 400s.
    */
   private resolvedComputerId: string | null = null
+  /** The repository this mission builds on, frozen when planning starts. */
+  private missionRepo = ''
 
   constructor(
     emitView: (view: EngineView) => void,
     deps: {
       factoryKey?: string
       cursorKey?: string
+      githubToken?: string
       repoUrl?: string
       computerId?: string
       workerPref?: WorkerPref
@@ -326,6 +399,7 @@ export class RealOrchestrator implements FactoryEngine {
     this.emitView = emitView
     this.factoryKey = deps.factoryKey ?? ''
     this.cursorKey = deps.cursorKey ?? ''
+    this.githubToken = deps.githubToken ?? ''
     this.repoUrl = deps.repoUrl ?? ''
     this.projectsSource = deps.projects ?? null
     this.computerId = deps.computerId ?? ''
@@ -345,6 +419,7 @@ export class RealOrchestrator implements FactoryEngine {
       computers: () => factoryComputers(this.factoryKey),
       listFactorySessions: () => factorySessions(this.factoryKey),
       listCursorAgents: () => cursorAgents(this.cursorKey),
+      createRepo: (name, isPrivate) => githubCreateRepo(this.githubToken, name, isPrivate),
       cursorAgent: (promptText, repoUrl) =>
         createCursorAgent(this.cursorKey, { promptText, repoUrl }),
       cursorRun: (agentId, promptText) =>
@@ -372,11 +447,14 @@ export class RealOrchestrator implements FactoryEngine {
    * Hot-apply connected accounts and preferences (the phone panel calls this
    * on every save; no reload, no restart). A running mission keeps its
    * workers; workers spawned afterwards follow the new setup. The home card
-   * re-renders when the engine sits there.
+   * re-renders when the engine sits there. A start that was waiting on a
+   * missing piece resumes in place the moment its save arrives, so the
+   * glasses never stall on a prompt the user already answered on the phone.
    */
   configure(o: {
     factoryKey?: string
     cursorKey?: string
+    githubToken?: string
     repoUrl?: string
     computerId?: string
     workerPref?: WorkerPref
@@ -389,6 +467,7 @@ export class RealOrchestrator implements FactoryEngine {
     const oldComputerId = this.computerId
     this.factoryKey = o.factoryKey ?? this.factoryKey
     this.cursorKey = o.cursorKey ?? this.cursorKey
+    this.githubToken = o.githubToken ?? this.githubToken
     this.repoUrl = o.repoUrl ?? this.repoUrl
     this.computerId = o.computerId ?? this.computerId
     if (this.computerId !== oldComputerId) {
@@ -403,7 +482,57 @@ export class RealOrchestrator implements FactoryEngine {
       this.cloudAgents = []
       this.nextCloudPoll = 0
     }
+    if (this.blockedStart && this.phase === 'transcript') {
+      // Resume the waiting start when the arriving save fixes its piece.
+      if (this.blockedStart === 'factory' && this.factoryKey) {
+        void this.startPlanning()
+        return
+      }
+      if (this.blockedStart === 'github' && this.githubToken) {
+        void this.startNewRepo()
+        return
+      }
+      if (this.blockedStart === 'repo' && (this.missionRepo || this.repoUrl)) {
+        void this.startPlanning()
+        return
+      }
+      if (this.blockedStart === 'computer' && this.computerId !== oldComputerId) {
+        void this.startPlanning() // revalidate against the new saved computer
+        return
+      }
+      // Still blocked: refresh the card only when the missing piece moved.
+      const piece = this.blockedPiece()
+      if (piece && piece !== this.blockedStart) this.emitBlockedPrompt(piece)
+      return
+    }
     if (this.phase === 'meet') this.emitCurrent() // connect affordances changed
+  }
+
+  /** The first missing piece for a start, in the order startPlanning checks. */
+  private blockedPiece(): BlockedStart | null {
+    if (!this.factoryKey) return 'factory'
+    if (this.blockedStart === 'github' && !this.githubToken) return 'github'
+    if (!(this.missionRepo || this.repoUrl)) return 'repo'
+    // A computer needs a live list to check; only the prompt's Retry does.
+    return this.blockedStart === 'computer' ? 'computer' : null
+  }
+
+  /** Show the waiting-start prompt for `piece` and remember the wait. */
+  private emitBlockedPrompt(piece: BlockedStart): void {
+    this.blockedStart = piece
+    if (piece === 'factory') {
+      this.emitConnectPrompt(COPY.real.needFactory, COPY.real.needFactoryStatus, COPY.real.needFactoryActions)
+      return
+    }
+    if (piece === 'github') {
+      this.emitConnectPrompt(COPY.real.needGithub, COPY.real.needGithubStatus, COPY.real.needGithubActions)
+      return
+    }
+    if (piece === 'repo') {
+      this.emitConnectPrompt(COPY.real.needRepo, COPY.real.needRepoStatus, COPY.real.needRepoActions)
+      return
+    }
+    this.emitConnectPrompt(COPY.real.needComputer, COPY.real.needComputerStatus, COPY.real.needComputerActions)
   }
 
   // ------------------------------------------------------------- progress
@@ -713,7 +842,7 @@ export class RealOrchestrator implements FactoryEngine {
         type: 'scene',
         scene: this.scene('repair', {
           pose: 'repair', utterance: this.workerIssue,
-          statusNote: 'Worker stopped', actions: COPY.real.failActions,
+          statusNote: 'Worker stopped', actions: COPY.real.stoppedActions,
           evidence: this.evidenceIds(),
         }),
       }
@@ -736,7 +865,10 @@ export class RealOrchestrator implements FactoryEngine {
           : this.faultKind === 'billing' ? COPY.real.errors.billing
             : this.faultKind === 'quota' ? COPY.real.errors.quota
               : this.faultKind === 'network' ? COPY.real.errors.network
-                : COPY.real.errors.service
+                : this.faultKind === 'offline' ? COPY.real.errors.offline
+                  : this.faultKind === 'permission' ? COPY.real.errors.permission
+                    : this.faultKind === 'exists' ? COPY.real.errors.exists
+                      : COPY.real.errors.service
     return {
       type: 'scene',
       scene: this.scene('factory_error', {
@@ -750,9 +882,11 @@ export class RealOrchestrator implements FactoryEngine {
   /**
    * Fault status line: the standard note plus the raw code (e.g. "Factory
    * HTTP 400") fitted to one row, so the glasses name the failure and the
-   * phone (which mirrors this line) can lead with it.
+   * phone (which mirrors this line) can lead with it. The offline fault
+   * names the machine instead of a code: that is the thing to fix.
    */
   private faultStatusNote(): string {
+    if (this.faultKind === 'offline') return COPY.real.offlineStatus
     return this.failureNoteFor(this.faultDetail)
   }
 
@@ -808,7 +942,7 @@ export class RealOrchestrator implements FactoryEngine {
           (p ? ` accepted=${p.acceptedWeight} pending=${p.pendingReviewWeight} total=${p.totalWeight}` : ''),
       )
     } else {
-      console.log(`[scene] kind=selection seq=${this.seq} items=${view.items.length}`)
+      console.log(`[scene] kind=selection seq=${this.seq} items=${view.items.length} purpose=${view.purpose}`)
     }
     this.emitView(view)
   }
@@ -1033,24 +1167,30 @@ export class RealOrchestrator implements FactoryEngine {
   /** Create the lead session and ask for the milestone (or job) plan. */
   private async startPlanning(): Promise<void> {
     if (this.busy || this.sessionId) return
-    // Missing pieces prompt from inside the flow; they never gate the app.
-    if (!this.factoryKey) {
-      this.emitConnectPrompt(COPY.real.needFactory, COPY.real.needFactoryStatus, COPY.real.needFactoryActions)
-      return
-    }
-    if (!this.repoUrl) {
-      this.emitConnectPrompt(COPY.real.needRepo, COPY.real.needRepoStatus, COPY.real.needRepoActions)
-      return
-    }
-    const computerId = await this.resolveComputer()
-    if (!computerId) {
-      this.emitConnectPrompt(COPY.real.needComputer, COPY.real.needComputerStatus, COPY.real.needComputerActions)
-      return
-    }
-    this.busy = true
-    this.phase = 'plan'
-    this.emitCurrent() // drafting card
+    this.busy = true // held across the awaits so a double save cannot double-start
     try {
+      // Missing pieces prompt from inside the flow; they never gate the app.
+      // blockedStart remembers the wait, so the panel save that fixes the
+      // piece resumes this start (the glasses never stall on a stale prompt).
+      if (!this.factoryKey) {
+        this.emitBlockedPrompt('factory')
+        return
+      }
+      if (!(this.missionRepo || this.repoUrl)) {
+        this.emitBlockedPrompt('repo')
+        return
+      }
+      const computerId = await this.resolveComputer()
+      if (!computerId) {
+        this.emitBlockedPrompt('computer')
+        return
+      }
+      this.blockedStart = null
+      // The repository is frozen per mission: a panel save mid-mission never
+      // moves a live run onto a different repository.
+      this.missionRepo = this.missionRepo || this.repoUrl
+      this.phase = 'plan'
+      this.emitCurrent() // drafting card
       const created = await this.clients.createSession({ computerId })
       this.sessionId = created.sessionId
       this.lastCount = 0
@@ -1058,7 +1198,7 @@ export class RealOrchestrator implements FactoryEngine {
       await this.clients.postMessage(this.sessionId, this.planRequest())
       this.awaiting = 'plan'
     } catch (e) {
-      if (!this.isBlip(e)) this.fault(e, 'factory')
+      if (!this.isBlip(e)) this.fault(e, 'factory', 'plan')
     } finally {
       this.busy = false
     }
@@ -1069,7 +1209,7 @@ export class RealOrchestrator implements FactoryEngine {
       'You are the orchestrator of a software factory run by Spriite for one developer.',
       'You coordinate; you do not edit code.',
       `Mission goal: ${this.goal}`,
-      `Repository the worker builds on: ${this.repoUrl}`,
+      `Repository the worker builds on: ${this.missionRepo}`,
     ]
     if (this.jobCount > 1) {
       lines.push(
@@ -1085,7 +1225,7 @@ export class RealOrchestrator implements FactoryEngine {
 
   private verdictRequest(job: RealJob): string {
     return [
-      `The worker pushed branch "${job.branch}" on ${this.repoUrl}.`,
+      `The worker pushed branch "${job.branch}" on ${this.missionRepo}.`,
       `Job: ${job.label}`,
       `Review the diff on that branch against the goal: ${this.goal}`,
       'Reply with VERDICT: PASS or VERDICT: FAIL followed by the key reasons, under 80 words.',
@@ -1208,7 +1348,7 @@ export class RealOrchestrator implements FactoryEngine {
     return [
       `Mission goal: ${this.goal}`,
       `Your job (job ${index + 1} of ${total}): ${job.label}`,
-      `Implement it on the repository ${this.repoUrl}.`,
+      `Implement it on the repository ${this.missionRepo}.`,
       `Push your work to a new branch named spriite/job-${index + 1}. Do not open a pull request.`,
       ...this.replyFormat(job),
     ].join('\n')
@@ -1230,7 +1370,7 @@ export class RealOrchestrator implements FactoryEngine {
       `Mission goal: ${this.goal}`,
       'All jobs passed review. Merge these branches into one new branch named spriite/integration:',
       ...branches.map((b) => `- ${b}`),
-      `Repository: ${this.repoUrl}. Resolve conflicts; keep every feature.`,
+      `Repository: ${this.missionRepo}. Resolve conflicts; keep every feature.`,
       'Push the integration branch. Do not open a pull request.',
       ...this.replyFormat(job),
     ].join('\n')
@@ -1240,7 +1380,7 @@ export class RealOrchestrator implements FactoryEngine {
     const branch = this.integrating ? 'spriite/integration' : job.branch
     const lines = [
       'The review passed.',
-      `Open a pull request from branch "${branch}" to the main branch on ${this.repoUrl}.`,
+      `Open a pull request from branch "${branch}" to the main branch on ${this.missionRepo}.`,
     ]
     if (job.mode === 'session') {
       lines.push('Reply with exactly these lines:', 'SUMMARY: <one sentence>', 'PR: <the pull request URL>')
@@ -1253,7 +1393,7 @@ export class RealOrchestrator implements FactoryEngine {
   /** Spawn a brand-new worker for a job (build stage only). */
   private async spawnJob(job: RealJob, promptText: string): Promise<void> {
     if (job.mode === 'cursor') {
-      const created = await this.clients.cursorAgent(promptText, this.repoUrl)
+      const created = await this.clients.cursorAgent(promptText, this.missionRepo)
       job.agentId = created.agentId
       if (created.runId) {
         job.runId = created.runId
@@ -1292,22 +1432,36 @@ export class RealOrchestrator implements FactoryEngine {
     job.nextPoll = 0
   }
 
+  /** True once a job's worker exists (a cursor worker also needs its run). */
+  private jobSpawned(job: RealJob): boolean {
+    return job.mode === 'cursor' ? Boolean(job.agentId && job.runId) : Boolean(job.sessionId)
+  }
+
+  /**
+   * Spawn the mission's workers. Jobs that already have a worker are skipped,
+   * so the fault card's Retry (after a mid-spawn failure) resumes the build
+   * without duplicating the workers that did start.
+   */
   private async startBuild(): Promise<void> {
-    if (this.busy || this.jobs.length > 0 || this.faultKind) return
+    if (this.busy || this.faultKind) return
+    if (this.jobs.length > 0 && this.jobs.every((j) => this.jobSpawned(j))) return // in flight
     this.busy = true
     this.decisionPending = false
     try {
-      this.jobs = this.createJobs()
-      this.milestones = this.buildMilestones(this.jobs)
+      if (this.jobs.length === 0) {
+        this.jobs = this.createJobs()
+        this.milestones = this.buildMilestones(this.jobs)
+      }
       const total = this.jobs.length
       for (let i = 0; i < total; i++) {
+        if (this.jobSpawned(this.jobs[i])) continue // already spawned
         await this.spawnJob(this.jobs[i], this.jobBuildPrompt(this.jobs[i], i, total))
       }
       this.phase = 'building'
       this.emitCurrent()
     } catch (e) {
-      const source = this.jobs[0]?.mode === 'cursor' ? 'cursor' : 'factory'
-      if (!this.isBlip(e)) this.fault(e, source)
+      const stalled = this.jobs.find((j) => !this.jobSpawned(j))
+      if (!this.isBlip(e)) this.fault(e, stalled?.mode === 'cursor' ? 'cursor' : 'factory', 'build')
     } finally {
       this.busy = false
     }
@@ -1324,7 +1478,7 @@ export class RealOrchestrator implements FactoryEngine {
       this.updatePhase()
       this.emitCurrent()
     } catch (e) {
-      if (!this.isBlip(e)) this.fault(e, job.mode === 'cursor' ? 'cursor' : 'factory')
+      if (!this.isBlip(e)) this.fault(e, job.mode === 'cursor' ? 'cursor' : 'factory', 'fix', index)
     }
   }
 
@@ -1345,7 +1499,7 @@ export class RealOrchestrator implements FactoryEngine {
       this.updatePhase()
       this.emitCurrent()
     } catch (e) {
-      if (!this.isBlip(e)) this.fault(e, job.mode === 'cursor' ? 'cursor' : 'factory')
+      if (!this.isBlip(e)) this.fault(e, job.mode === 'cursor' ? 'cursor' : 'factory', 'integration')
     } finally {
       this.busy = false
     }
@@ -1383,7 +1537,7 @@ export class RealOrchestrator implements FactoryEngine {
       this.setStatus('pr', 'submitted')
       this.phase = 'pr'
     } catch (e) {
-      if (!this.isBlip(e)) this.fault(e, job.mode === 'cursor' ? 'cursor' : 'factory')
+      if (!this.isBlip(e)) this.fault(e, job.mode === 'cursor' ? 'cursor' : 'factory', 'pr')
     } finally {
       this.busy = false
     }
@@ -1421,7 +1575,8 @@ export class RealOrchestrator implements FactoryEngine {
       await this.clients.postMessage(this.sessionId, this.verdictRequest(job))
       this.awaiting = 'verdict'
     } catch (e) {
-      if (!this.isBlip(e)) this.fault(e, 'factory')
+      const index = this.jobs.indexOf(job)
+      if (!this.isBlip(e)) this.fault(e, 'factory', 'verdict', index >= 0 ? index : undefined)
     }
   }
 
@@ -1546,6 +1701,11 @@ export class RealOrchestrator implements FactoryEngine {
     this.setStatus('pr', 'accepted')
     this.phase = 'final'
     this.emitCurrent()
+    await this.postPrSummary()
+  }
+
+  /** Ask the lead for the final one-sentence summary (after the PR opens). */
+  private async postPrSummary(): Promise<void> {
     if (!this.sessionId) return
     try {
       await this.clients.postMessage(this.sessionId, [
@@ -1554,7 +1714,7 @@ export class RealOrchestrator implements FactoryEngine {
       ].join('\n'))
       this.awaiting = 'summary'
     } catch (e) {
-      if (!this.isBlip(e)) this.fault(e, 'factory')
+      if (!this.isBlip(e)) this.fault(e, 'factory', 'summary')
     }
   }
 
@@ -1564,6 +1724,19 @@ export class RealOrchestrator implements FactoryEngine {
     switch (id) {
       case 'start_planning':
         void this.startPlanning()
+        return
+      case 'new_repo':
+        // The transcript card and the missing-repo prompt offer it: start
+        // (or restart) the pending goal in a brand-new repository.
+        this.startNewRepo()
+        return
+      case 'retry_start':
+        // The missing-computer prompt: re-attempt the start in place (the
+        // user may have just brought the daemon back online).
+        void this.startPlanning()
+        return
+      case 'retry':
+        this.retryFault()
         return
       case 'begin':
         // Start build: confirm once; live runs spend credits.
@@ -1631,15 +1804,152 @@ export class RealOrchestrator implements FactoryEngine {
   private async answerDecision(text: string): Promise<void> {
     if (!this.decisionPending || !this.sessionId) return
     this.decisionPending = false
+    this.lastDecision = text
     this.busy = true
     try {
       await this.clients.postMessage(this.sessionId, text)
       this.awaiting = 'steer'
       this.emitCurrent()
     } catch (e) {
-      if (!this.isBlip(e)) this.fault(e, 'factory')
+      if (!this.isBlip(e)) this.fault(e, 'factory', 'decision')
     } finally {
       this.busy = false
+    }
+  }
+
+  // ---------------------------------------------------- new-repo missions
+
+  /**
+   * Start the pending goal in a brand-new GitHub repository. The glasses
+   * action derives the name from the goal; the phone can type one (kept in
+   * repoName by sayNewRepo). Without a GitHub token the card says how to add
+   * one, and the save that adds it resumes the start.
+   */
+  startNewRepo(): void {
+    if (!this.goal || this.sessionId || this.busy || this.faultKind) return
+    if (!this.githubToken) {
+      this.emitBlockedPrompt('github')
+      return
+    }
+    void this.createRepoAndPlan()
+  }
+
+  /**
+   * Typed goal from the phone that should build in a brand-new repository.
+   * Returns where the text went, like say().
+   */
+  sayNewRepo(text: string, name: string): 'goal' | 'steer' | 'none' {
+    const clean = text.replace(/\s+/g, ' ').trim()
+    if (!clean || !this.acceptsGoal()) return 'none'
+    this.repoName = name.replace(/\s+/g, ' ').trim()
+    if (this.sessionId) {
+      // A running mission takes it as steering, like any other new goal.
+      return this.steer(`New goal: ${clean}`) ? 'steer' : 'none'
+    }
+    this.goal = clean
+    this.capturedSec = 0
+    this.phase = 'transcript'
+    this.emitCurrent()
+    this.startNewRepo()
+    return 'goal'
+  }
+
+  /** Create `base`; a taken name steps aside (-2, -3, then a dated name). */
+  private async createRepoWithFallback(base: string): Promise<{ url: string }> {
+    const isTaken = (e: unknown): boolean =>
+      e instanceof Error && 'kind' in e && (e as { kind: unknown }).kind === 'exists'
+    for (const name of [base, `${base}-2`, `${base}-3`]) {
+      try {
+        return await this.clients.createRepo(name, true)
+      } catch (e) {
+        if (!isTaken(e)) throw e
+      }
+    }
+    return this.clients.createRepo(`${base}-${new Date().toISOString().slice(2, 10).replace(/-/g, '')}`, true)
+  }
+
+  /** Create the new repository, freeze it as this mission's repo, and plan. */
+  private async createRepoAndPlan(): Promise<void> {
+    if (this.busy || this.sessionId) return
+    const base = this.repoName || repoNameFromGoal(this.goal)
+    this.repoName = ''
+    this.busy = true
+    this.blockedStart = null
+    this.emitTransientScene(
+      this.scene('status_answer', {
+        pose: 'planning', utterance: COPY.real.creatingRepo,
+        statusNote: COPY.real.creatingRepoStatus,
+        actions: [{ id: 'back', label: 'Back', kind: 'command' }],
+        transientMs: MS(20),
+      }),
+      MS(20),
+    )
+    try {
+      const created = await this.createRepoWithFallback(base)
+      this.missionRepo = created.url
+    } catch (e) {
+      if (!this.isBlip(e)) this.fault(e, 'github', 'repo')
+      return
+    } finally {
+      this.busy = false
+    }
+    this.transient = null // the drafting card replaces the creating card
+    await this.startPlanning()
+  }
+
+  // ---------------------------------------------------------------- faults
+
+  /**
+   * The fault card's Retry: clear the failure and re-run the step that
+   * failed. Poll faults have no recorded step; clearing the card lets the
+   * tick loop resume them.
+   */
+  private retryFault(): void {
+    if (!this.faultKind) return
+    const retry = this.faultRetry
+    const index = this.faultRetryIndex
+    this.faultKind = null
+    this.faultSource = null
+    this.faultDetail = ''
+    this.faultRetry = null
+    this.faultRetryIndex = null
+    switch (retry) {
+      case 'plan':
+        void this.startPlanning()
+        return
+      case 'repo':
+        void this.createRepoAndPlan()
+        return
+      case 'build':
+        void this.startBuild()
+        return
+      case 'fix':
+        if (index !== null) void this.startFixRun(index)
+        else this.emitCurrent()
+        return
+      case 'integration':
+        void this.startIntegration()
+        return
+      case 'pr':
+        void this.startPrStage()
+        return
+      case 'verdict': {
+        const job = index !== null ? this.jobs[index] : null
+        if (job) void this.postVerdictRequest(job)
+        else this.emitCurrent()
+        return
+      }
+      case 'summary':
+        void this.postPrSummary()
+        return
+      case 'decision':
+        void this.answerDecision(this.lastDecision)
+        return
+      case 'steer':
+        void this.postSteer(this.lastSteer)
+        return
+      default:
+        this.emitCurrent() // a poll fault: the tick loop resumes
     }
   }
 
@@ -1746,7 +2056,10 @@ export class RealOrchestrator implements FactoryEngine {
 
   transcriptGoal(sec: number): void {
     // No live STT this turn: a real mission cannot invent a goal (honesty).
-    if (this.goal) {
+    // Pre-mission, the transcript card replays the captured goal. Mid-mission
+    // nothing can be captured, so the card says what is missing instead of
+    // switching to a transcript card the running mission cannot answer.
+    if (this.goal && !this.sessionId) {
       this.phase = 'transcript'
       this.capturedSec = sec
       this.emitCurrent()
@@ -1773,6 +2086,13 @@ export class RealOrchestrator implements FactoryEngine {
 
   voiceGoal(text: string, sec: number): void {
     if (this.phase === 'attach') this.detach() // the watched build keeps running
+    if (this.sessionId) {
+      // A running mission takes a new spoken goal as steering for the lead
+      // (it can re-plan). Overwriting the goal silently would strand the
+      // live run behind a card whose Start action no-ops.
+      this.steer(`New goal: ${text}`)
+      return
+    }
     this.goal = text
     this.capturedSec = sec
     this.phase = 'transcript'
@@ -1842,6 +2162,7 @@ export class RealOrchestrator implements FactoryEngine {
     if (this.busy || !this.sessionId) return
     this.busy = true
     this.decisionPending = false
+    this.lastSteer = text
     const watching = this.phase === 'attach'
     try {
       await this.clients.postMessage(this.sessionId, text, this.attach?.computerId ?? undefined)
@@ -1862,7 +2183,7 @@ export class RealOrchestrator implements FactoryEngine {
         )
         return
       }
-      this.fault(e, 'factory')
+      this.fault(e, 'factory', 'steer')
     } finally {
       this.busy = false
     }
@@ -1901,20 +2222,27 @@ export class RealOrchestrator implements FactoryEngine {
   private async resumeLead(): Promise<void> {
     if (!this.sessionId) return
     this.busy = true
+    this.lastSteer = 'Continue.'
     try {
       await this.clients.postMessage(this.sessionId, 'Continue.')
       this.awaiting = this.awaiting ?? 'steer'
       this.emitCurrent()
     } catch (e) {
-      if (!this.isBlip(e)) this.fault(e, 'factory')
+      if (!this.isBlip(e)) this.fault(e, 'factory', 'steer')
     } finally {
       this.busy = false
     }
   }
 
   acceptsGoal(): boolean {
+    if (this.faultKind) return false // the fault card owns the engine until acted on
     if (this.phase === 'attach') return !this.attachSteerable()
-    return ['meet', 'goal', 'transcript', 'plan'].includes(this.phase)
+    // 'plan' only before the lead session exists; once it does, a new goal is
+    // steering (voiceGoal routes it), not a fresh transcript.
+    return (
+      ['meet', 'goal', 'transcript'].includes(this.phase) ||
+      (this.phase === 'plan' && !this.sessionId)
+    )
   }
 
   canPause(): boolean {
@@ -1972,12 +2300,19 @@ export class RealOrchestrator implements FactoryEngine {
 
   // ------------------------------------------------------------- lifecycle
 
-  private fault(e: unknown, source: 'factory' | 'cursor'): void {
+  private fault(
+    e: unknown,
+    source: 'factory' | 'cursor' | 'github',
+    retry?: FaultRetry,
+    retryIndex?: number,
+  ): void {
     const kind = e instanceof Error && 'kind' in e ? String((e as { kind: unknown }).kind) : 'service'
     if (this.faultKind) return // the first failure owns the card
     this.faultKind = kind
     this.faultSource = source
     this.faultDetail = e instanceof Error ? e.message : String(e ?? '')
+    this.faultRetry = retry ?? null
+    this.faultRetryIndex = retryIndex ?? null
     console.warn(`[engine] ${source} fault (${kind}):`, this.faultDetail)
     this.emitCurrent()
   }
@@ -2025,6 +2360,13 @@ export class RealOrchestrator implements FactoryEngine {
     this.faultKind = null
     this.faultSource = null
     this.faultDetail = ''
+    this.faultRetry = null
+    this.faultRetryIndex = null
+    this.blockedStart = null
+    this.missionRepo = ''
+    this.repoName = ''
+    this.lastSteer = ''
+    this.lastDecision = ''
     this.busy = false
     this.attach = null
     this.cloudSessions = []
@@ -2050,6 +2392,8 @@ export class RealOrchestrator implements FactoryEngine {
       goal: this.goal,
       capturedSec: this.capturedSec,
       repoUrl: this.repoUrl,
+      missionRepo: this.missionRepo,
+      blockedStart: this.blockedStart,
       sessionId: this.sessionId,
       awaiting: this.awaiting,
       workerPref: this.workerPref,
@@ -2101,6 +2445,11 @@ export class RealOrchestrator implements FactoryEngine {
       faultKind: this.faultKind,
       faultSource: this.faultSource,
       faultDetail: this.faultDetail,
+      faultRetry: this.faultRetry,
+      faultRetryIndex: this.faultRetryIndex,
+      lastSteer: this.lastSteer,
+      lastDecision: this.lastDecision,
+      repoName: this.repoName,
       seq: this.seq,
     }
   }
@@ -2117,6 +2466,10 @@ export class RealOrchestrator implements FactoryEngine {
     this.phase = s.phase ?? 'meet'
     this.goal = s.goal ?? ''
     this.capturedSec = s.capturedSec ?? 0
+    // The mission's repository is frozen per mission; older snapshots carry
+    // only the global one (which the mission used back then).
+    this.missionRepo = s.missionRepo ?? s.repoUrl ?? ''
+    this.blockedStart = s.blockedStart ?? null // a later panel save still resumes it
     this.sessionId = s.sessionId ?? null
     this.awaiting = s.awaiting ?? null
     this.jobs = s.jobs.map((j) => ({
@@ -2177,6 +2530,11 @@ export class RealOrchestrator implements FactoryEngine {
     this.faultKind = s.faultKind ?? null
     this.faultSource = s.faultSource ?? null
     this.faultDetail = typeof s.faultDetail === 'string' ? s.faultDetail : ''
+    this.faultRetry = s.faultRetry ?? null
+    this.faultRetryIndex = s.faultRetryIndex ?? null
+    this.lastSteer = s.lastSteer ?? ''
+    this.lastDecision = s.lastDecision ?? ''
+    this.repoName = s.repoName ?? ''
     this.transient = null
     this.overlay = null
     this.workerIssue = null

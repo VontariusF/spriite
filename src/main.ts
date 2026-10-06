@@ -27,7 +27,7 @@ import { TalkController, type TalkFinishReason } from './audio/talk'
 import { COPY } from './factory/copy'
 import { DemoFactory, type EngineView } from './factory/demo'
 import type { FactoryEngine } from './factory/engine'
-import { RealOrchestrator, type RealSnapshot } from './factory/real'
+import { RealOrchestrator, type RealClients, type RealSnapshot } from './factory/real'
 import type { AppEvent } from './input/events'
 import { parseUtterance, sanitizeSpoken, VOICE_KEYTERMS, type VoiceCommand } from './voice/intent'
 import { InputNormalizer } from './input/normalize'
@@ -101,6 +101,14 @@ function sleep(ms: number): Promise<void> {
 
 // ------------------------------------------------------------- engine output
 
+let lastFocusKey = ''
+
+function viewFocusKey(view: EngineView): string {
+  return view.type === 'scene'
+    ? `scene:${view.scene.kind}:${view.scene.actions.map((a) => a.id).join(',')}`
+    : `list:${view.purpose}:${view.items.join('\n')}`
+}
+
 function onEngineView(view: EngineView): void {
   const snap = engine.snapshot()
   store.engineSnapshot = snap
@@ -108,13 +116,20 @@ function onEngineView(view: EngineView): void {
   // Recent-projects history: real missions only (the demo never lands here).
   if (engine === realEngine) projects.saveActive(snap as RealSnapshot)
   phone?.notify(view) // the phone companion mirrors every card
-  store.focusIdx = 0 // a fresh card focuses its primary action
+  // A fresh card focuses its primary action. The engine also re-emits the
+  // same card (polls, status ticks); resetting focus then would move the
+  // highlight under the user's finger and fire the wrong action on tap.
+  const key = viewFocusKey(view)
+  if (key !== lastFocusKey) store.focusIdx = 0
+  lastFocusKey = key
   if (store.uiMode !== 'scene') return // a local capture owns the display
   void presentEngineView(view)
 }
 
 async function presentEngineView(view: EngineView): Promise<void> {
   if (glassesConnected === false) return // the connection notice owns the HUD (G36)
+  // Leaving a local card: its focus index means nothing on the engine card.
+  if (displayed?.type === 'scene' && displayed.origin === 'local') store.focusIdx = 0
   if (view.type === 'scene') {
     const issues = validateScene(view.scene, 'engine')
     if (issues.length > 0) {
@@ -598,6 +613,7 @@ function runAction(action: SceneAction): void {
       // demo exits it (in the real engine it resets the mission).
       if (action.id === 'connect_factory') return focusSetupSection('factory')
       if (action.id === 'connect_repo') return focusSetupSection('repo')
+      if (action.id === 'connect_github') return focusSetupSection('github')
       if (action.id === 'connect_voice') return focusSetupSection('voice')
       if (action.id === 'demo') return enterDemo()
       if (action.id === 'restart') return resetOrExitDemo()
@@ -607,7 +623,7 @@ function runAction(action: SceneAction): void {
 }
 
 /** Scroll the phone panel to a section and flash it (connect prompts). */
-function focusSetupSection(section: 'factory' | 'repo' | 'voice'): void {
+function focusSetupSection(section: 'factory' | 'repo' | 'github' | 'voice'): void {
   window.dispatchEvent(new CustomEvent('spriite-connect', { detail: section }))
 }
 
@@ -791,17 +807,52 @@ async function init(): Promise<void> {
   })
 
   // `?fresh=1` (dev/test only) starts from a clean story; saves still happen.
-  const fresh = new URLSearchParams(window.location.search).has('fresh')
+  const params = new URLSearchParams(window.location.search)
+  const fresh = params.has('fresh')
   await store.load()
   await keys.load()
   await prefs.load()
   await projects.load()
+
+  // Dev-only scripted mode (?fake=1): walks every real-engine card in the
+  // simulator with no keys, no network, and no credits. The module loads
+  // behind import.meta.env.DEV, so production builds never include it.
+  // Companions: fake-norepo (block on the repository), fake-nogithub (the
+  // new-repo path asks for a token), fake-offline (the first session create
+  // answers 503), fake-askpr (gate before the PR), fake-goal=<text> (boot
+  // straight to the transcript card), fake-phone=now (open the phone's Now
+  // tab for webview captures).
+  let fakeDeps: {
+    factoryKey?: string
+    cursorKey?: string
+    githubToken?: string
+    repoUrl?: string
+    computerId?: string
+    askBeforePr?: boolean
+    clients?: RealClients
+  } = {}
+  let fakeGoal = ''
+  if (import.meta.env.DEV && params.has('fake')) {
+    const { fakeClients, FAKE } = await import('./factory/fake')
+    fakeDeps = {
+      factoryKey: keys.factory || FAKE.factoryKey,
+      cursorKey: keys.cursor || FAKE.cursorKey,
+      githubToken: params.has('fake-nogithub') ? '' : keys.github || FAKE.githubToken,
+      repoUrl: params.has('fake-norepo') ? '' : keys.repoUrl || FAKE.repoUrl,
+      computerId: keys.computerId || FAKE.computerId,
+      askBeforePr: params.has('fake-askpr') ? true : undefined,
+      clients: fakeClients({ offlineOnce: params.has('fake-offline') }),
+    }
+    fakeGoal = params.get('fake-goal') ?? ''
+    console.log('[engine] fake mode (dev only): scripted API, no network, no credits')
+  }
 
   // The real engine always runs; a missing piece becomes an in-app prompt
   // (never a gate). Its home shows recent projects and connects from within.
   realEngine = new RealOrchestrator(onEngineView, {
     factoryKey: keys.factory,
     cursorKey: keys.cursor,
+    githubToken: keys.github,
     repoUrl: keys.repoUrl,
     computerId: keys.computerId,
     workerPref: prefs.worker,
@@ -811,6 +862,7 @@ async function init(): Promise<void> {
       list: () => projects.list(),
       snapshotFor: (goal) => projects.snapshotFor(goal),
     },
+    ...fakeDeps,
   })
   engine = realEngine
   if (fresh) {
@@ -837,6 +889,7 @@ async function init(): Promise<void> {
     onSaved: () => realEngine?.configure({
       factoryKey: keys.factory,
       cursorKey: keys.cursor,
+      githubToken: keys.github,
       repoUrl: keys.repoUrl,
       computerId: keys.computerId,
       workerPref: prefs.worker,
@@ -844,9 +897,14 @@ async function init(): Promise<void> {
       askBeforePr: prefs.askBeforePr,
     }),
   })
+  // Dev-only: scripted walkthroughs can capture the phone's Now tab.
+  if (import.meta.env.DEV && params.get('fake-phone') === 'now') {
+    document.querySelector<HTMLButtonElement>('.sp header .segs .seg')?.click()
+  }
 
   unsubEvents = bridge.onEvenHubEvent(onHubEvent)
 
+  if (fakeGoal) realEngine.voiceGoal(fakeGoal, 10) // boot straight to the transcript card
   engine.boot() // emits the first view; renderer creates the startup page
 
   setInterval(() => engine.tick(), 400)

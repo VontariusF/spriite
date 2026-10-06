@@ -70,7 +70,9 @@ const UTTERANCES = [
   // Real orchestrator (connected accounts) cards; the worker is a Cursor
   // cloud agent or a second Factory session, so copy stays worker-neutral.
   'Connect Factory on your phone to run real builds, or say "run the demo" to watch a simulated one.',
-  'Pick a repository on your phone, then tell me what to build.',
+  'Pick a repository on your phone, or start this build in a new one.',
+  'To start this build in a new repository, add a GitHub token on your phone.',
+  'Creating a new repository on GitHub, then planning the build.',
   'Factory needs a computer to run builds. Open the Factory app on your Mac or add a cloud computer, then try again.',
   'To speak your goals, add an ElevenLabs key on your phone.',
   'Factory is drafting the plan. This takes a minute.',
@@ -90,6 +92,9 @@ const UTTERANCES = [
   'Factory sessions are not enabled on this account yet.',
   'A service hit a usage or rate limit. Nothing was changed.',
   'A service was unreachable. Nothing was changed.',
+  'Your computer is offline. Open the Factory app on it and turn on Remote Access, then retry.',
+  'The GitHub token is missing permission for that. Nothing was changed.',
+  'That repository name is taken. Try again with a new name.',
   'A service failed. Nothing was changed.',
   'Your Factory account needs billing or credits. Nothing was changed.',
   'That build could not take your message. It is still running.',
@@ -139,6 +144,9 @@ const STATUSES = [
   'Connect Factory',
   'Pick repository',
   'Connect computer',
+  'Connect GitHub',
+  'GitHub | creating',
+  'Computer offline | check Factory app',
   // Real orchestrator composed statuses (worst cases)
   '0% verified | Factory planning',
   '20% verified | 5 milestones',
@@ -178,7 +186,7 @@ const ACTIONS = [
   'Set up my factory', 'Continue', 'Choose a goal', 'Start planning', 'Change',
   'Start', 'Milestones', 'Talk', 'Pause', 'Resume', 'Use it', 'Explain', 'Back',
   'Show evidence', 'Restart demo', 'Restart', 'Retry', 'Cancel', 'Confirm',
-  'Start build', 'Open PR', 'Connect', 'Pick on phone', 'Demo',
+  'Start build', 'Open PR', 'Connect', 'Pick on phone', 'New repo', 'Demo',
 ]
 const LIST_ITEMS = [
   'Talk to Spriite',
@@ -276,6 +284,13 @@ const lines = [
   '> Connect   Demo   Talk',
   '> Pick on phone   Talk',
   '> Explain   Talk   Back',
+  // Real-engine cards with the new affordances (retry, new repository).
+  '> Pick on phone   New repo   Talk',
+  '> Start planning   New repo   Change',
+  '> Retry   Talk   Restart',
+  '> Connect   Retry   Talk',
+  '> Connect   Talk',
+  '> Start build   Talk',
 ]
 for (const t of lines) {
   const w = getTextWidth(t)

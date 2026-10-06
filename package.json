@@ -1,7 +1,7 @@
 {
   "name": "spriite",
   "private": true,
-  "version": "0.2.0",
+  "version": "0.2.1",
   "description": "Voice-first companion for running an AI software factory (Factory, Cursor) from HUD smart glasses. Bring your own keys; self-hosted relay.",
   "license": "Apache-2.0",
   "type": "module",
@@ -14,6 +14,10 @@
     "sheet": "node scripts/contact-sheet.mjs",
     "sim": "node node_modules/@evenrealities/evenhub-simulator/bin/index.js \"http://localhost:5173/?fresh=1\" --automation-port 9898",
     "walkthrough": "node scripts/walkthrough.mjs",
+    "sim:offline": "node node_modules/@evenrealities/evenhub-simulator/bin/index.js \"http://localhost:5173/?fresh=1&fake=1&fake-goal=Deliver%20the%20empty-state%20screen&fake-offline=1&fake-askpr=1&fake-phone=now\" --automation-port 9899",
+    "sim:blocked": "node node_modules/@evenrealities/evenhub-simulator/bin/index.js \"http://localhost:5173/?fresh=1&fake=1&fake-norepo=1&fake-nogithub=1&fake-goal=Deliver%20the%20empty-state%20screen\" --automation-port 9900",
+    "sim:newrepo": "node node_modules/@evenrealities/evenhub-simulator/bin/index.js \"http://localhost:5173/?fresh=1&fake=1&fake-norepo=1&fake-goal=Build%20a%20landing%20page%20for%20Acme&fake-phone=now\" --automation-port 9901",
+    "walk:real": "node scripts/walkthrough-real.mjs",
     "pack": "npm run check:copy && npm run build && node scripts/pack.mjs spriite.ehpk",
     "relay": "node relay/node.mjs"
   },

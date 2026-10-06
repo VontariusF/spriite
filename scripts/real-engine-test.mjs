@@ -34,6 +34,10 @@ function makeClients({
   cloudAgents = [],
   computers = [{ id: 'comp-1', name: 'Studio Mac', status: 'active' }],
   rejectPostSessions = [],
+  repoTakenNames = [],
+  // Fault injections: the Nth createSession call throws instead.
+  offlineCreateSessionOnce = false,
+  failCreateSessionAtCall = 0,
 } = {}) {
   const sessions = new Map() // id -> { msgs: [], count, status }
   const runs = new Map() // runId -> { agentId, prompt, polls }
@@ -41,6 +45,10 @@ function makeClients({
   let agentN = 0
   let runN = 0
   let msgN = 0
+  let createCalls = 0
+  let offlineFails = offlineCreateSessionOnce ? 1 : 0
+  const repoCreates = [] // { name, isPrivate } per createRepo call
+  const agentRepos = [] // repoUrl per cursor agent create
   const verdictFails = new Map() // branch -> times failed
   const createdWith = [] // computerId per createSession call, in order
   const postedWith = [] // { id, computerId } per postMessage call
@@ -107,7 +115,33 @@ function makeClients({
     /** computerId per createSession call, in order (assert the resolution). */
     createdComputers: () => createdWith.slice(),
     computers: async () => computers.map((c) => ({ ...c })),
+    /** Names handed to createRepo, in order (with the private flag). */
+    repoCreated: () => repoCreates.slice(),
+    /** Repository per Cursor agent create (workers build on the mission repo). */
+    agentRepos: () => agentRepos.slice(),
+    createRepo: async (name, isPrivate) => {
+      if (repoTakenNames.includes(name)) {
+        const e = new Error('GitHub HTTP 422')
+        e.kind = 'exists'
+        throw e
+      }
+      repoCreates.push({ name, isPrivate })
+      return { url: `https://github.com/example/${name}` }
+    },
     createSession: async (opts) => {
+      createCalls += 1
+      if (offlineFails > 0) {
+        offlineFails -= 1
+        // What Factory answers when the mission's computer daemon is down.
+        const e = new Error('Factory could not reach the computer (failed to connect to computer daemon)')
+        e.kind = 'offline'
+        throw e
+      }
+      if (createCalls === failCreateSessionAtCall) {
+        const e = new Error('Factory HTTP 500 (internal)')
+        e.kind = 'service'
+        throw e
+      }
       const id = `sess-${++sessN}`
       // The lead session is created first; later sessions are workers.
       createdWith.push(opts?.computerId ?? '')
@@ -135,6 +169,7 @@ function makeClients({
     cursorAgent: async (promptText, repoUrl) => {
       const agentId = `agent-${++agentN}`
       const runId = `run-${++runN}`
+      agentRepos.push(repoUrl)
       runs.set(runId, { agentId, prompt: promptText, polls: 0, repoUrl })
       return { agentId, runId }
     },
@@ -328,18 +363,22 @@ console.log('== Real engine fake-pipeline test ==')
   engine.chooseList(1)
   assert(engine.currentView.type === 'selection' && engine.currentView.purpose === 'goal', 'New build opens the goal list')
 
-  // Live configure (panel saves hot-apply; no reload): repo appears, the
-  // missing-repository prompt goes away.
+  // Live configure (panel saves hot-apply; no reload): repo appears, and the
+  // save itself resumes the start that was waiting on it (the reported
+  // stall: the glasses kept showing the prompt after the phone pick).
   const eventsNoRepo = []
-  const engineNoRepo = new RealOrchestrator(record(eventsNoRepo), { ...deps({ repoUrl: '', workerPref: 'factory', jobs: 1 }), clients: makeClients() })
+  const clientsNoRepo = makeClients()
+  const engineNoRepo = new RealOrchestrator(record(eventsNoRepo), { ...deps({ repoUrl: '', workerPref: 'factory', jobs: 1 }), clients: clientsNoRepo })
   engineNoRepo.boot()
   engineNoRepo.voiceGoal('Deliver the empty-state screen', 10)
   engineNoRepo.handleAction('start_planning')
   let v = engineNoRepo.currentView
   assert(v.type === 'scene' && v.scene.kind === 'setup_notice' && v.scene.utterance.includes('Pick a repository'), 'missing repository prompts from inside the flow')
-  engineNoRepo.configure({ repoUrl: REPO })
-  engineNoRepo.handleAction('start_planning')
-  assert(await drive(engineNoRepo, (e) => e.currentView.type === 'scene' && e.currentView.scene.kind === 'plan' && e.currentView.scene.utterance.includes('The plan is ready')), 'configure hot-applies the repository (no reload)')
+  assert(v.scene.actions.some((a) => a.id === 'connect_repo' && a.kind === 'command') && v.scene.actions.some((a) => a.id === 'new_repo'), 'the repo prompt offers phone pick and New repo')
+  engineNoRepo.configure({ repoUrl: REPO }) // the phone panel save
+  assert(await drive(engineNoRepo, (e) => e.currentView.type === 'scene' && e.currentView.scene.kind === 'plan' && e.currentView.scene.utterance.includes('The plan is ready')), 'the repo save resumes the waiting start (no stall, no second tap)')
+  engineNoRepo.handleAction('start_planning') // pressing Start again is a no-op
+  assert(clientsNoRepo.leadSessionCount() === 1, 'the resumed start created exactly one lead session')
 
   // No Factory key: the home is the connect prompt (setup never gates boot).
   const engineNoFactory = new RealOrchestrator(record([]), { ...deps({ factoryKey: '', repoUrl: '' }), clients: makeClients() })
@@ -582,6 +621,212 @@ console.log('== Real engine fake-pipeline test ==')
   assert(engine.steer('Try again') === true, 'the watch still takes messages after a refusal')
 }
 
+// ------------------------- new-repo missions (start from scratch)
+
+{
+  console.log('New-repo missions: a goal can start in a repository that does not exist yet')
+  const clients = makeClients()
+  const events = []
+  const engine = new RealOrchestrator(record(events), {
+    ...deps({ repoUrl: '', githubToken: 'gh-test', workerPref: 'factory', jobs: 1 }),
+    clients,
+  })
+  engine.boot()
+  engine.voiceGoal('Build a landing page for Acme!', 12)
+  engine.handleAction('start_planning') // blocked: no repository chosen
+  engine.handleAction('new_repo') // from the prompt card
+  assert(await drive(engine, (e) => e.currentView.type === 'scene' && e.currentView.scene.kind === 'plan' && e.currentView.scene.utterance.includes('The plan is ready')), 'the new-repo mission plans')
+  const created = clients.repoCreated()
+  assert(created.length === 1 && created[0].name === 'build-a-landing-page-for-acme' && created[0].isPrivate === true, 'the repository name derives from the goal (private)')
+  const leadMsgs = await clients.getMessages('sess-1')
+  assert(leadMsgs.some((m) => m.text.includes('Repository the worker builds on: https://github.com/example/build-a-landing-page-for-acme')), 'the plan request names the new repository')
+
+  // The mission repo is frozen: a mid-mission repo save never moves the run.
+  engine.handleAction('begin')
+  engine.handleAction('use_it')
+  assert(await drive(engine, (e) => e.currentView.type === 'scene' && e.currentView.scene.kind === 'running'), 'the new-repo mission builds')
+  engine.configure({ repoUrl: REPO }) // a panel save picks a different repo
+  const snap = JSON.parse(JSON.stringify(engine.snapshot()))
+  assert(snap.missionRepo === 'https://github.com/example/build-a-landing-page-for-acme', 'the snapshot carries the mission repository')
+  const events2 = []
+  const engine2 = new RealOrchestrator(record(events2), {
+    ...deps({ repoUrl: REPO, workerPref: 'factory', jobs: 1, askBeforePr: false }),
+    clients,
+  })
+  engine2.restore(snap)
+  assert(engine2.snapshot().missionRepo === 'https://github.com/example/build-a-landing-page-for-acme', 'restore keeps the frozen mission repository')
+  assert(await drive(engine2, (e) => e.currentView.type === 'scene' && e.currentView.scene.kind === 'final'), 'the restored mission finishes')
+  const msgs = await clients.getMessages('sess-1')
+  assert(msgs.some((m) => m.text.includes('on https://github.com/example/build-a-landing-page-for-acme.')), 'the verdict request still names the mission repository')
+
+  // Older snapshots (no missionRepo field) fall back to their saved repo.
+  const legacy = JSON.parse(JSON.stringify(snap))
+  delete legacy.missionRepo
+  const engine3 = new RealOrchestrator(record([]), { ...deps({ workerPref: 'factory', jobs: 1, askBeforePr: false }), clients: makeClients() })
+  engine3.restore(legacy)
+  assert(engine3.snapshot().missionRepo === REPO, 'a legacy snapshot restores its repository from the old field')
+}
+
+{
+  console.log('New-repo missions: taken names step aside, and Cursor workers build on the new repo')
+  const clients = makeClients({ repoTakenNames: ['build-a-portfolio-site'] })
+  const engine = new RealOrchestrator(record([]), {
+    ...deps({ repoUrl: '', githubToken: 'gh-test', workerPref: 'cursor', jobs: 1, askBeforePr: false }),
+    clients,
+  })
+  engine.boot()
+  engine.voiceGoal('Build a portfolio site', 10)
+  engine.handleAction('new_repo') // from the transcript card directly
+  assert(await drive(engine, (e) => e.currentView.type === 'scene' && e.currentView.scene.kind === 'plan' && e.currentView.scene.utterance.includes('The plan is ready')), 'the mission plans after the name fallback')
+  const created = clients.repoCreated()
+  assert(created.length === 1 && created[0].name === 'build-a-portfolio-site-2', 'a taken name steps aside to -2')
+  engine.handleAction('begin')
+  engine.handleAction('use_it')
+  assert(await drive(engine, (e) => e.currentView.type === 'scene' && e.currentView.scene.kind === 'final'), 'the Cursor worker finishes the new-repo mission')
+  assert(clients.agentRepos().every((r) => r === 'https://github.com/example/build-a-portfolio-site-2'), 'the Cursor worker builds on the new repository')
+}
+
+{
+  console.log('New-repo missions: no GitHub token prompts, and the token save resumes')
+  const clients = makeClients()
+  const engine = new RealOrchestrator(record([]), {
+    ...deps({ repoUrl: '', githubToken: '', workerPref: 'factory', jobs: 1 }),
+    clients,
+  })
+  engine.boot()
+  engine.voiceGoal('Build a docs site', 10)
+  engine.handleAction('new_repo')
+  let v = engine.currentView
+  assert(v.type === 'scene' && v.scene.kind === 'setup_notice' && v.scene.utterance.includes('add a GitHub token'), 'new repo without a token says what is missing')
+  assert(v.scene.status === 'Connect GitHub' && v.scene.actions.some((a) => a.id === 'connect_github'), 'the card points at the GitHub setup step')
+  engine.configure({ githubToken: 'gh-test' }) // the panel save
+  assert(await drive(engine, (e) => e.currentView.type === 'scene' && e.currentView.scene.kind === 'plan' && e.currentView.scene.utterance.includes('The plan is ready')), 'the token save resumes the new-repo start')
+  assert(clients.repoCreated().length === 1, 'the repository was created after the token arrived')
+}
+
+{
+  console.log('New-repo missions: the phone can type the goal and the name')
+  const clients = makeClients()
+  const engine = new RealOrchestrator(record([]), {
+    ...deps({ repoUrl: REPO, githubToken: 'gh-test', workerPref: 'factory', jobs: 1 }),
+    clients,
+  })
+  engine.boot()
+  assert(engine.sayNewRepo('Ship a changelog page', 'changelog-page') === 'goal', 'sayNewRepo takes a typed new-repo goal')
+  assert(await drive(engine, (e) => e.currentView.type === 'scene' && e.currentView.scene.kind === 'plan' && e.currentView.scene.utterance.includes('The plan is ready')), 'the typed new-repo goal plans')
+  assert(clients.repoCreated().length === 1 && clients.repoCreated()[0].name === 'changelog-page', 'a typed name wins over the derived one')
+  engine.reset()
+  engine.say('Fix the footer') // back to the chosen repository
+  assert(await drive(engine, (e) => e.currentView.type === 'scene' && e.currentView.scene.kind === 'plan' && e.currentView.scene.utterance.includes('The plan is ready')), 'a normal typed goal still plans')
+  assert(clients.repoCreated().length === 1 && clients.leadSessionCount() === 2, 'a normal goal creates no repository, just a session')
+}
+
+// --------------------------- fault card: Retry resumes the failed step
+
+{
+  console.log('Offline computer (HTTP 503): the fault names the daemon and Retry resumes')
+  const clients = makeClients({ offlineCreateSessionOnce: true })
+  const events = []
+  const engine = new RealOrchestrator(record(events), { ...deps({ workerPref: 'factory', jobs: 1 }), clients })
+  engine.boot()
+  engine.voiceGoal('Deliver the empty-state screen', 10)
+  engine.handleAction('start_planning')
+  assert(await drive(engine, (e) => e.currentView.type === 'scene' && e.currentView.scene.kind === 'factory_error'), 'the offline computer faults')
+  let v = engine.currentView
+  assert(v.scene.utterance.includes('Your computer is offline'), 'the fault says the computer is offline')
+  assert(v.scene.status === 'Computer offline | check Factory app', 'the status line points at the machine, not a code')
+  assert(v.scene.actions.some((a) => a.id === 'retry'), 'the fault card offers Retry')
+  engine.handleAction('retry') // the user started the daemon and pressed Retry
+  assert(await drive(engine, (e) => e.currentView.type === 'scene' && e.currentView.scene.kind === 'plan' && e.currentView.scene.utterance.includes('The plan is ready')), 'Retry re-runs the start after the daemon comes back')
+  assert(clients.leadSessionCount() === 1, 'no session was created while offline')
+}
+
+{
+  console.log('Mid-spawn failure: Retry resumes only the workers that never started')
+  // Two Factory-session workers; the first worker create (2nd session call) fails once.
+  const clients = makeClients({ failCreateSessionAtCall: 2 })
+  const events = []
+  const engine = new RealOrchestrator(record(events), {
+    ...deps({ workerPref: 'factory', jobs: 2, askBeforePr: false }),
+    clients,
+  })
+  engine.boot()
+  engine.voiceGoal('Deliver the empty-state screen', 10)
+  engine.handleAction('start_planning')
+  assert(await drive(engine, (e) => e.currentView.type === 'scene' && e.currentView.scene.kind === 'plan' && e.currentView.scene.utterance.includes('The plan is ready')), 'the mission plans before the spawn fails')
+  engine.handleAction('begin')
+  engine.handleAction('use_it')
+  assert(await drive(engine, (e) => e.currentView.type === 'scene' && e.currentView.scene.kind === 'factory_error'), 'the failed worker spawn faults the build')
+  assert(engine.currentView.scene.actions.some((a) => a.id === 'retry'), 'the build fault offers Retry')
+  engine.handleAction('retry')
+  assert(await drive(engine, (e) => e.currentView.type === 'scene' && e.currentView.scene.kind === 'final'), 'Retry spawns the missing worker and the mission finishes')
+  assert(clients.leadSessionCount() === 3, 'exactly the lead and two workers exist after the retry')
+}
+
+// ----------------------- missing computer: Retry and the save resume it
+
+{
+  console.log('Missing computer: Retry re-attempts once the daemon is online')
+  const computerList = [] // the user starts the daemon mid-flow
+  const clients = makeClients({ computers: computerList })
+  const engine = new RealOrchestrator(record([]), {
+    ...deps({ repoUrl: REPO, computerId: '', workerPref: 'factory', jobs: 1 }),
+    clients,
+  })
+  engine.boot()
+  engine.voiceGoal('Deliver the empty-state screen', 12)
+  engine.handleAction('start_planning')
+  assert(await drive(engine, (e) => e.currentView.type === 'scene' && e.currentView.scene.kind === 'setup_notice' && e.currentView.scene.utterance.includes('Factory needs a computer')), 'no computer: the mission prompts to connect one')
+  assert(engine.currentView.scene.actions.some((a) => a.id === 'retry_start'), 'the prompt offers Retry')
+  computerList.push({ id: 'comp-live', name: 'Studio Mac', status: 'active' })
+  engine.handleAction('retry_start')
+  assert(await drive(engine, (e) => e.currentView.type === 'scene' && e.currentView.scene.kind === 'plan' && e.currentView.scene.utterance.includes('The plan is ready')), 'Retry proceeds once the computer is active')
+  assert(clients.createdComputers()[0] === 'comp-live', 'the session create names the active computer')
+
+  // A panel save that changes the saved computer resumes the wait too.
+  const computerList2 = []
+  const clients2 = makeClients({ computers: computerList2 })
+  const engine2 = new RealOrchestrator(record([]), {
+    ...deps({ repoUrl: REPO, computerId: '', workerPref: 'factory', jobs: 1 }),
+    clients: clients2,
+  })
+  engine2.boot()
+  engine2.voiceGoal('Deliver the empty-state screen', 12)
+  engine2.handleAction('start_planning')
+  assert(await drive(engine2, (e) => e.currentView.type === 'scene' && e.currentView.scene.kind === 'setup_notice' && e.currentView.scene.utterance.includes('Factory needs a computer')), 'blocked again without a computer')
+  computerList2.push({ id: 'comp-b', name: 'Book Mac', status: 'active' })
+  engine2.configure({ computerId: 'comp-b' }) // the panel save
+  assert(await drive(engine2, (e) => e.currentView.type === 'scene' && e.currentView.scene.kind === 'plan' && e.currentView.scene.utterance.includes('The plan is ready')), 'the computer save resumes the waiting start')
+  assert(clients2.createdComputers()[0] === 'comp-b', 'the resumed start runs on the saved computer')
+}
+
+// --------------- mid-mission goals steer the lead; they never strand the run
+
+{
+  console.log('Mid-mission goals steer the lead session')
+  const clients = makeClients()
+  const engine = new RealOrchestrator(record([]), {
+    ...deps({ workerPref: 'factory', jobs: 1, askBeforePr: false }),
+    clients,
+  })
+  engine.boot()
+  engine.say('Deliver the empty-state screen')
+  assert(await drive(engine, (e) => e.currentView.type === 'scene' && e.currentView.scene.kind === 'plan' && e.currentView.scene.utterance.includes('The plan is ready')), 'the mission plans')
+  engine.handleAction('begin')
+  engine.handleAction('use_it')
+  assert(await drive(engine, (e) => e.currentView.type === 'scene' && e.currentView.scene.kind === 'running'), 'the mission builds')
+  engine.voiceGoal('Also add a dark mode toggle', 6)
+  const msgs = await clients.getMessages('sess-1')
+  assert(msgs.some((m) => m.role === 'user' && m.text === 'New goal: Also add a dark mode toggle'), 'a spoken mid-mission goal steers the lead')
+  // Talk without a voice key mid-mission never fakes a transcript card.
+  const before = engine.snapshot().phase
+  engine.transcriptGoal(5)
+  let v = engine.currentView
+  assert(v.type === 'scene' && v.scene.kind === 'setup_notice' && v.scene.utterance.includes('ElevenLabs'), 'keyless Talk mid-mission says what is missing')
+  assert(engine.snapshot().phase === before, 'the keyless Talk never switches the running mission to a transcript card')
+  assert(await drive(engine, (e) => e.currentView.type === 'scene' && e.currentView.scene.kind === 'final'), 'the mission still finishes')
+}
+
 {
   console.log('Ring input: fast scroll ticks all move focus')
   const realNow = Date.now
@@ -612,4 +857,4 @@ if (failures > 0) {
   console.log(`REAL ENGINE TEST FAILED: ${failures} failures`)
   process.exit(1)
 }
-console.log('REAL ENGINE TEST PASSED: plan, 3 mixed workers, reviews, repair loop, integration, PR gate, projects home, resume, live configure, cloud builds home, watch + attach, computer resolve + prompt, phone surface (say, listBuilds, openBuild)')
+console.log('REAL ENGINE TEST PASSED: plan, 3 mixed workers, reviews, repair loop, integration, PR gate, projects home, resume, live configure, cloud builds home, watch + attach, computer resolve + prompt, phone surface (say, listBuilds, openBuild), new-repo missions, blocked-start resume, fault Retry, mid-spawn resume, mid-mission steering')

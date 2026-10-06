@@ -14,7 +14,20 @@
  * (import.meta.env is undefined there, so Node keeps the absolute URL).
  */
 
-export type FactoryErrorKind = 'auth' | 'forbidden' | 'quota' | 'billing' | 'network' | 'service'
+/**
+ * - 'offline': the API is up but the mission's Droid Computer is not. The
+ *   daemon on that machine is not running (Factory app closed or Remote
+ *   Access off): start it in the Factory app (Settings -> Droid Computers ->
+ *   Remote Access) or run `droid daemon --remote-access`, then retry.
+ */
+export type FactoryErrorKind =
+  | 'auth'
+  | 'forbidden'
+  | 'quota'
+  | 'billing'
+  | 'network'
+  | 'offline'
+  | 'service'
 
 export class FactoryError extends Error {
   readonly kind: FactoryErrorKind
@@ -84,6 +97,25 @@ async function call<T>(
   if (res.status === 429) throw new FactoryError('quota', 'Factory rate or usage limit')
   // 402: the account needs billing or credits before anything can run.
   if (res.status === 402) throw new FactoryError('billing', 'Factory needs billing or credits')
+  if (res.status === 503) {
+    // The mission's computer is not reachable: its daemon is not running
+    // (BYOM machines report active in the list regardless, so this is the
+    // first honest signal). Ride the API's reason for the phone.
+    let detail = ''
+    try {
+      const raw = await res.text()
+      try {
+        const parsed = JSON.parse(raw) as { detail?: unknown; title?: unknown; message?: unknown }
+        detail = [parsed?.title, parsed?.detail ?? parsed?.message]
+          .filter(Boolean).map((v) => (typeof v === 'string' ? v : JSON.stringify(v))).join(': ')
+      } catch {
+        detail = raw.slice(0, 200)
+      }
+    } catch {
+      detail = ''
+    }
+    throw new FactoryError('offline', `Factory could not reach the computer${detail ? ` (${detail})` : ''}`)
+  }
   if (!res.ok) {
     // The API's own reason (FactoryApiError: title + detail, or a bare
     // message) rides in the error so the phone can show it.
