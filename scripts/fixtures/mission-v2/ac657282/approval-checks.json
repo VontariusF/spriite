@@ -1,0 +1,42 @@
+{
+  "artifacts": [
+    {
+      "id": "contract",
+      "where": "/home/user/.factory/missionsV2/ac657282-a7e8-431b-b98d-6b04d03c55bd/mission.md",
+      "description": "The approved feature, scope, boundaries, and completion agreement",
+      "identity": "sha256:a70ff1d5907ee3dfc2ca1e7b57f2a7c37ae611c8b7a9ed1120e8e490c418feab"
+    },
+    {
+      "id": "deliverable",
+      "where": "/tmp/spriite-canary/work",
+      "description": "The local repository containing the greeting feature, test, package script, and commit",
+      "identity": "planning-state:git:597b65cc8b4721e89168f2439384cb74e045f8da;package.json:sha256:32b5c79c6a8e42bf897ff647e98f9952ce9921691c86e5fac0fd0f0642e66937;untracked:ANSWERS.md,CANARY.md"
+    }
+  ],
+  "checks": [
+    {
+      "id": "feature-shape",
+      "group": "Feature correctness",
+      "description": "The repository contains the requested named greeting export, exact behavior test, and Node test script.",
+      "about": "deliverable",
+      "kind": "verification",
+      "how": "Inspect greet.js, greet.test.js, and package.json against [[contract#required-outcome]]. Confirm greet.js has the named export greet(name) with the required interpolation behavior; greet.test.js imports that named export, uses node:test, and asserts greet(\"Ada\") equals exactly \"Hello, Ada!\"; package.json scripts.test equals \"node --test\". Pass only if every condition holds."
+    },
+    {
+      "id": "npm-test-passes",
+      "group": "Feature correctness",
+      "description": "The required npm test command discovers and passes the greeting test.",
+      "about": "deliverable",
+      "kind": "verification",
+      "how": "From /tmp/spriite-canary/work run npm test. Pass only when the command exits 0 and the Node TAP summary reports exactly one test passed, with zero failures, cancellations, skips, and todos."
+    },
+    {
+      "id": "local-commit-complete",
+      "group": "Repository completion",
+      "description": "The feature is committed locally on main without including protected or unrelated files.",
+      "about": "deliverable",
+      "kind": "verification",
+      "how": "Inspect Git locally against [[contract#boundaries]]. Confirm the current branch is main; the tip commit contains greet.js and greet.test.js (and package.json only if it required an in-scope change); no in-scope path has uncommitted changes; no remote was added or changed; and ANSWERS.md plus CANARY.md remain untracked and absent from the tip commit. Pass only if all conditions hold."
+    }
+  ]
+}

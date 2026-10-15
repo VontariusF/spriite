@@ -1,0 +1,725 @@
+{
+  "note": "Recorded live against Factory, 2026-xx; see docs/MISSION-PROBE-FINDINGS.md",
+  "sessionId": "833576d1-71da-4aa7-9141-f6e04e1f2f87",
+  "computerId": "00000000-0000-4000-8000-0000000000c0",
+  "calls": [
+    {
+      "atMs": 0,
+      "role": "create",
+      "method": "POST",
+      "path": "/api/v0/sessions",
+      "status": 201,
+      "request": {
+        "computerId": "00000000-0000-4000-8000-0000000000c0",
+        "sessionSettings": {
+          "interactionMode": "mission",
+          "autonomyLevel": "high"
+        }
+      },
+      "response": {
+        "sessionId": "833576d1-71da-4aa7-9141-f6e04e1f2f87",
+        "title": "",
+        "status": "idle",
+        "createdAt": 1791728336345,
+        "updatedAt": 1791728336345,
+        "computerId": "00000000-0000-4000-8000-0000000000c0",
+        "messageCount": 0
+      }
+    },
+    {
+      "atMs": 1516,
+      "role": "getSession",
+      "method": "GET",
+      "path": "/api/v0/sessions/833576d1-71da-4aa7-9141-f6e04e1f2f87?computerId=00000000-0000-4000-8000-0000000000c0",
+      "status": 200,
+      "request": null,
+      "response": {
+        "sessionId": "833576d1-71da-4aa7-9141-f6e04e1f2f87",
+        "title": "New Session",
+        "status": "idle",
+        "createdAt": 1791728337868,
+        "updatedAt": 1791728337868,
+        "computerId": "00000000-0000-4000-8000-0000000000c0",
+        "messageCount": 0,
+        "factoryCredits": 0
+      }
+    },
+    {
+      "atMs": 3110,
+      "role": "postMessage",
+      "method": "POST",
+      "path": "/api/v0/sessions/833576d1-71da-4aa7-9141-f6e04e1f2f87/messages",
+      "status": 200,
+      "request": {
+        "text": "<goal or approval text, elided>",
+        "computerId": "00000000-0000-4000-8000-0000000000c0"
+      },
+      "response": {
+        "messageId": "2428dd98-e51e-44f3-aa0c-ca2065d76144",
+        "status": "pending"
+      }
+    },
+    {
+      "atMs": 19742,
+      "role": "getSession",
+      "method": "GET",
+      "path": "/api/v0/sessions/833576d1-71da-4aa7-9141-f6e04e1f2f87?computerId=00000000-0000-4000-8000-0000000000c0",
+      "status": 200,
+      "request": null,
+      "response": {
+        "sessionId": "833576d1-71da-4aa7-9141-f6e04e1f2f87",
+        "title": "Add config unit test on feature branch",
+        "status": "idle",
+        "createdAt": 1791728339595,
+        "updatedAt": 1791728353474,
+        "computerId": "00000000-0000-4000-8000-0000000000c0",
+        "messageCount": 6,
+        "factoryCredits": 34561
+      }
+    },
+    {
+      "atMs": 22990,
+      "role": "postMessage",
+      "method": "POST",
+      "path": "/api/v0/sessions/833576d1-71da-4aa7-9141-f6e04e1f2f87/messages",
+      "status": 200,
+      "request": {
+        "text": "<goal or approval text, elided>",
+        "computerId": "00000000-0000-4000-8000-0000000000c0"
+      },
+      "response": {
+        "messageId": "59eb881b-e55e-4df6-9605-d36be34dd9f0",
+        "status": "pending"
+      }
+    },
+    {
+      "atMs": 39710,
+      "role": "getSession",
+      "method": "GET",
+      "path": "/api/v0/sessions/833576d1-71da-4aa7-9141-f6e04e1f2f87?computerId=00000000-0000-4000-8000-0000000000c0",
+      "status": 200,
+      "request": null,
+      "response": {
+        "sessionId": "833576d1-71da-4aa7-9141-f6e04e1f2f87",
+        "title": "Add config unit test on feature branch",
+        "status": "idle",
+        "createdAt": 1791728339595,
+        "updatedAt": 1791728353474,
+        "computerId": "00000000-0000-4000-8000-0000000000c0",
+        "messageCount": 6,
+        "factoryCredits": 34561
+      }
+    },
+    {
+      "atMs": 57633,
+      "role": "getSession",
+      "method": "GET",
+      "path": "/api/v0/sessions/833576d1-71da-4aa7-9141-f6e04e1f2f87?computerId=00000000-0000-4000-8000-0000000000c0",
+      "status": 200,
+      "request": null,
+      "response": {
+        "sessionId": "833576d1-71da-4aa7-9141-f6e04e1f2f87",
+        "title": "Add config unit test on feature branch",
+        "status": "idle",
+        "createdAt": 1791728339595,
+        "updatedAt": 1791728353474,
+        "computerId": "00000000-0000-4000-8000-0000000000c0",
+        "messageCount": 6,
+        "factoryCredits": 34561
+      }
+    },
+    {
+      "atMs": 75506,
+      "role": "getSession",
+      "method": "GET",
+      "path": "/api/v0/sessions/833576d1-71da-4aa7-9141-f6e04e1f2f87?computerId=00000000-0000-4000-8000-0000000000c0",
+      "status": 200,
+      "request": null,
+      "response": {
+        "sessionId": "833576d1-71da-4aa7-9141-f6e04e1f2f87",
+        "title": "Add config unit test on feature branch",
+        "status": "idle",
+        "createdAt": 1791728339595,
+        "updatedAt": 1791728409645,
+        "computerId": "00000000-0000-4000-8000-0000000000c0",
+        "messageCount": 9,
+        "factoryCredits": 34561
+      }
+    },
+    {
+      "atMs": 93726,
+      "role": "getSession",
+      "method": "GET",
+      "path": "/api/v0/sessions/833576d1-71da-4aa7-9141-f6e04e1f2f87?computerId=00000000-0000-4000-8000-0000000000c0",
+      "status": 200,
+      "request": null,
+      "response": {
+        "sessionId": "833576d1-71da-4aa7-9141-f6e04e1f2f87",
+        "title": "Add config unit test on feature branch",
+        "status": "idle",
+        "createdAt": 1791728339595,
+        "updatedAt": 1791728422764,
+        "computerId": "00000000-0000-4000-8000-0000000000c0",
+        "messageCount": 13,
+        "factoryCredits": 46371
+      }
+    },
+    {
+      "atMs": 112051,
+      "role": "getSession",
+      "method": "GET",
+      "path": "/api/v0/sessions/833576d1-71da-4aa7-9141-f6e04e1f2f87?computerId=00000000-0000-4000-8000-0000000000c0",
+      "status": 200,
+      "request": null,
+      "response": {
+        "sessionId": "833576d1-71da-4aa7-9141-f6e04e1f2f87",
+        "title": "Add config unit test on feature branch",
+        "status": "idle",
+        "createdAt": 1791728339595,
+        "updatedAt": 1791728445000,
+        "computerId": "00000000-0000-4000-8000-0000000000c0",
+        "messageCount": 19,
+        "factoryCredits": 61957
+      }
+    },
+    {
+      "atMs": 115428,
+      "role": "interrupt",
+      "method": "POST",
+      "path": "/api/v0/sessions/833576d1-71da-4aa7-9141-f6e04e1f2f87/interrupt",
+      "status": 200,
+      "request": null,
+      "response": {
+        "status": "idle"
+      }
+    },
+    {
+      "atMs": 137188,
+      "role": "getSession",
+      "method": "GET",
+      "path": "/api/v0/sessions/833576d1-71da-4aa7-9141-f6e04e1f2f87?computerId=00000000-0000-4000-8000-0000000000c0",
+      "status": 200,
+      "request": null,
+      "response": {
+        "sessionId": "833576d1-71da-4aa7-9141-f6e04e1f2f87",
+        "title": "Add config unit test on feature branch",
+        "status": "idle",
+        "createdAt": 1791728339595,
+        "updatedAt": 1791728451635,
+        "computerId": "00000000-0000-4000-8000-0000000000c0",
+        "messageCount": 21,
+        "factoryCredits": 61957
+      }
+    },
+    {
+      "atMs": 140366,
+      "role": "other:/api/v0/sessions?limit=50&computerId=00000000-0000-4000-8000-0000000000c0",
+      "method": "GET",
+      "path": "/api/v0/sessions?limit=50&computerId=00000000-0000-4000-8000-0000000000c0",
+      "status": 200,
+      "request": null,
+      "response": {
+        "sessions": [
+          {
+            "sessionId": "3fbc38da-3508-460e-98ee-40e582467f07",
+            "parent_session_id": "cc2afaef-9b3a-4bf3-b29a-7b3c80d3c868",
+            "title": "Worker: Verify mission dependency readiness",
+            "status": "idle",
+            "createdAt": 1791728474000,
+            "updatedAt": 1791728474000,
+            "computerId": "00000000-0000-4000-8000-0000000000c0",
+            "messageCount": 15
+          },
+          {
+            "sessionId": "78704a27-6e85-435c-a27a-078f14d7e8a6",
+            "title": "Spriite",
+            "status": "idle",
+            "createdAt": 1791728463000,
+            "updatedAt": 1791728463000,
+            "computerId": "00000000-0000-4000-8000-0000000000c0",
+            "messageCount": 9951
+          },
+          {
+            "sessionId": "833576d1-71da-4aa7-9141-f6e04e1f2f87",
+            "title": "Add config unit test on feature branch",
+            "status": "idle",
+            "createdAt": 1791728451000,
+            "updatedAt": 1791728451000,
+            "computerId": "00000000-0000-4000-8000-0000000000c0",
+            "messageCount": 25
+          },
+          {
+            "sessionId": "cc2afaef-9b3a-4bf3-b29a-7b3c80d3c868",
+            "title": "Create Spriite V2 fork for the owner",
+            "status": "idle",
+            "createdAt": 1791728404000,
+            "updatedAt": 1791728404000,
+            "computerId": "00000000-0000-4000-8000-0000000000c0",
+            "messageCount": 51
+          },
+          {
+            "sessionId": "507634b5-7257-4f89-9dc6-4ded7bae9ea6",
+            "parent_session_id": "cc2afaef-9b3a-4bf3-b29a-7b3c80d3c868",
+            "title": "Explorer: Discover full-spec operational requirements",
+            "status": "idle",
+            "createdAt": 1791728366000,
+            "updatedAt": 1791728366000,
+            "computerId": "00000000-0000-4000-8000-0000000000c0",
+            "messageCount": 30
+          },
+          {
+            "sessionId": "9fc3007b-3b62-4386-b4e1-d3d9c0bd082f",
+            "parent_session_id": "cc2afaef-9b3a-4bf3-b29a-7b3c80d3c868",
+            "title": "Worker: Create private Spriite V2",
+            "status": "idle",
+            "createdAt": 1791728103000,
+            "updatedAt": 1791728103000,
+            "computerId": "00000000-0000-4000-8000-0000000000c0",
+            "messageCount": 18
+          },
+          {
+            "sessionId": "0a5e7084-1935-48cf-8ac9-6f11cc4bc510",
+            "parent_session_id": "cc2afaef-9b3a-4bf3-b29a-7b3c80d3c868",
+            "title": "Explorer: Analyze Herdr rebuild specification",
+            "status": "idle",
+            "createdAt": 1791727977000,
+            "updatedAt": 1791727977000,
+            "computerId": "00000000-0000-4000-8000-0000000000c0",
+            "messageCount": 30
+          },
+          {
+            "sessionId": "112182ce-4fa7-45a4-97a5-129bd524b31a",
+            "title": "DECISION: What is the primary goal for this Spriite factory setup",
+            "status": "idle",
+            "createdAt": 1791679487000,
+            "updatedAt": 1791679487000,
+            "computerId": "00000000-0000-4000-8000-0000000000c0",
+            "messageCount": 4
+          },
+          {
+            "sessionId": "069a1979-4923-4103-abf7-625d071a9eea",
+            "parent_session_id": "78704a27-6e85-435c-a27a-078f14d7e8a6",
+            "title": "Worker: Product contract review",
+            "status": "idle",
+            "createdAt": 1791648212000,
+            "updatedAt": 1791648212000,
+            "computerId": "00000000-0000-4000-8000-0000000000c0",
+            "messageCount": 95
+          },
+          {
+            "sessionId": "3538a9a9-1a7a-49ae-9143-4f8b750f044c",
+            "parent_session_id": "78704a27-6e85-435c-a27a-078f14d7e8a6",
+            "title": "Explorer: Trace Activity speaker attribution",
+            "status": "idle",
+            "createdAt": 1791648197000,
+            "updatedAt": 1791648197000,
+            "computerId": "00000000-0000-4000-8000-0000000000c0",
+            "messageCount": 212
+          },
+          {
+            "sessionId": "4a1dc3dc-1d88-4195-a294-2a5774500c9a",
+            "parent_session_id": "78704a27-6e85-435c-a27a-078f14d7e8a6",
+            "title": "Explorer: Audit watch-mode controls",
+            "status": "idle",
+            "createdAt": 1791648016000,
+            "updatedAt": 1791648016000,
+            "computerId": "00000000-0000-4000-8000-0000000000c0",
+            "messageCount": 96
+          },
+          {
+            "sessionId": "81b371d6-bfd9-47c5-9efa-010b4912c9e8",
+            "parent_session_id": "78704a27-6e85-435c-a27a-078f14d7e8a6",
+            "title": "Explorer: Audit build switching behavior",
+            "status": "idle",
+            "createdAt": 1791648001000,
+            "updatedAt": 1791648001000,
+            "computerId": "00000000-0000-4000-8000-0000000000c0",
+            "messageCount": 68
+          },
+          {
+            "sessionId": "05b92223-288e-4489-b0c2-4056ff675756",
+            "parent_session_id": "78704a27-6e85-435c-a27a-078f14d7e8a6",
+            "title": "Explorer: Trace glasses new-repo input",
+            "status": "idle",
+            "createdAt": 1791647704000,
+            "updatedAt": 1791647704000,
+            "computerId": "00000000-0000-4000-8000-0000000000c0",
+            "messageCount": 175
+          },
+          {
+            "sessionId": "bff04189-435f-4482-bc29-ba65c5b8cb8f",
+            "parent_session_id": "78704a27-6e85-435c-a27a-078f14d7e8a6",
+            "title": "Explorer: Audit phone and runtime flow",
+            "status": "idle",
+            "createdAt": 1791647662000,
+            "updatedAt": 1791647662000,
+            "computerId": "00000000-0000-4000-8000-0000000000c0",
+            "messageCount": 134
+          },
+          {
+            "sessionId": "ce3f28dd-818b-43d8-896c-9264b5504e48",
+            "title": "1. CLI foundation - basic command structure and argument parsing working",
+            "status": "idle",
+            "createdAt": 1791644250000,
+            "updatedAt": 1791644250000,
+            "computerId": "00000000-0000-4000-8000-0000000000c0",
+            "messageCount": 30
+          },
+          {
+            "sessionId": "25c83896-0f77-42e7-ab2d-bdf2dff1df58",
+            "parent_session_id": "78704a27-6e85-435c-a27a-078f14d7e8a6",
+            "title": "Worker: Fix X credential persistence",
+            "status": "idle",
+            "createdAt": 1791640621000,
+            "updatedAt": 1791640621000,
+            "computerId": "00000000-0000-4000-8000-0000000000c0",
+            "messageCount": 577
+          },
+          {
+            "sessionId": "872f437d-a4e0-48ca-b911-769158c80f0a",
+            "parent_session_id": "78704a27-6e85-435c-a27a-078f14d7e8a6",
+            "title": "Worker: Integrate round five fixes",
+            "status": "idle",
+            "createdAt": 1791609723000,
+            "updatedAt": 1791609723000,
+            "computerId": "00000000-0000-4000-8000-0000000000c0",
+            "messageCount": 430
+          },
+          {
+            "sessionId": "fe321bae-c155-4129-ab51-fb8357209eb4",
+            "parent_session_id": "78704a27-6e85-435c-a27a-078f14d7e8a6",
+            "title": "Worker: Audit engines runtime intake relay",
+            "status": "idle",
+            "createdAt": 1791607004000,
+            "updatedAt": 1791607004000,
+            "computerId": "00000000-0000-4000-8000-0000000000c0",
+            "messageCount": 459
+          },
+          {
+            "sessionId": "04cf18d4-3d0f-4bdc-b35c-1fcf742852f8",
+            "parent_session_id": "78704a27-6e85-435c-a27a-078f14d7e8a6",
+            "title": "Worker: Audit phone setup state layer",
+            "status": "idle",
+            "createdAt": 1791606274000,
+            "updatedAt": 1791606274000,
+            "computerId": "00000000-0000-4000-8000-0000000000c0",
+            "messageCount": 421
+          },
+          {
+            "sessionId": "cb7ce6ef-80bc-4e1e-9bc5-6d42ed6566ab",
+            "parent_session_id": "78704a27-6e85-435c-a27a-078f14d7e8a6",
+            "title": "Worker: Audit HUD render input layer",
+            "status": "idle",
+            "createdAt": 1791605985000,
+            "updatedAt": 1791605985000,
+            "computerId": "00000000-0000-4000-8000-0000000000c0",
+            "messageCount": 296
+          },
+          {
+            "sessionId": "6f4f544f-a9a4-4868-96e5-b39c813b0808",
+            "parent_session_id": "78704a27-6e85-435c-a27a-078f14d7e8a6",
+            "title": "Worker: Integrate X rounds end to end",
+            "status": "idle",
+            "createdAt": 1791601351000,
+            "updatedAt": 1791601351000,
+            "computerId": "00000000-0000-4000-8000-0000000000c0",
+            "messageCount": 467
+          },
+          {
+            "sessionId": "482b4b1c-87ec-4ebf-ac29-787c74ef4e17",
+            "parent_session_id": "78704a27-6e85-435c-a27a-078f14d7e8a6",
+            "title": "Worker: Deep audit X journey surfaces",
+            "status": "idle",
+            "createdAt": 1791598869000,
+            "updatedAt": 1791598869000,
+            "computerId": "00000000-0000-4000-8000-0000000000c0",
+            "messageCount": 319
+          },
+          {
+            "sessionId": "fdf3f910-f094-41de-b267-503ada4066bc",
+            "parent_session_id": "78704a27-6e85-435c-a27a-078f14d7e8a6",
+            "title": "Worker: Deep audit X intake pipeline",
+            "status": "idle",
+            "createdAt": 1791598298000,
+            "updatedAt": 1791598298000,
+            "computerId": "00000000-0000-4000-8000-0000000000c0",
+            "messageCount": 95
+          },
+          {
+            "sessionId": "9f1caf56-f283-4465-81c4-ab9b7281e5b6",
+            "parent_session_id": "78704a27-6e85-435c-a27a-078f14d7e8a6",
+            "title": "Worker: Close cross-agent fixes and integrate",
+            "status": "idle",
+            "createdAt": 1791597028000,
+            "updatedAt": 1791597028000,
+            "computerId": "00000000-0000-4000-8000-0000000000c0",
+            "messageCount": 232
+          },
+          {
+            "sessionId": "f14365b3-dd08-4a72-8275-b543568ae133",
+            "parent_session_id": "78704a27-6e85-435c-a27a-078f14d7e8a6",
+            "title": "Worker: Deep audit renderer and input",
+            "status": "idle",
+            "createdAt": 1791595823000,
+            "updatedAt": 1791595823000,
+            "computerId": "00000000-0000-4000-8000-0000000000c0",
+            "messageCount": 339
+          },
+          {
+            "sessionId": "865e06fc-b400-464c-83b4-3728ed34120a",
+            "parent_session_id": "78704a27-6e85-435c-a27a-078f14d7e8a6",
+            "title": "Worker: Deep audit engines and intake",
+            "status": "idle",
+            "createdAt": 1791595672000,
+            "updatedAt": 1791595672000,
+            "computerId": "00000000-0000-4000-8000-0000000000c0",
+            "messageCount": 389
+          },
+          {
+            "sessionId": "e1f1054f-6859-4007-99f8-2f1d0a062ee4",
+            "parent_session_id": "78704a27-6e85-435c-a27a-078f14d7e8a6",
+            "title": "Worker: Deep audit phone setup state",
+            "status": "idle",
+            "createdAt": 1791595387000,
+            "updatedAt": 1791595387000,
+            "computerId": "00000000-0000-4000-8000-0000000000c0",
+            "messageCount": 345
+          },
+          {
+            "sessionId": "bf552268-e102-4279-b38d-65fdd00b9e90",
+            "title": "World Compiler",
+            "status": "idle",
+            "createdAt": 1791573440000,
+            "updatedAt": 1791573440000,
+            "computerId": "00000000-0000-4000-8000-0000000000c0",
+            "messageCount": 6638
+          },
+          {
+            "sessionId": "cdb01a61-e4e1-4f2e-9388-b8a4bfcb9e2c",
+            "parent_session_id": "bf552268-e102-4279-b38d-65fdd00b9e90",
+            "title": "Worker: Surface permanent relay auth rejection",
+            "status": "idle",
+            "createdAt": 1791572513000,
+            "updatedAt": 1791572513000,
+            "computerId": "00000000-0000-4000-8000-0000000000c0",
+            "messageCount": 214
+          },
+          {
+            "sessionId": "469c19bd-9432-4fd7-9825-b1d3d21b0b5d",
+            "parent_session_id": "bf552268-e102-4279-b38d-65fdd00b9e90",
+            "title": "Worker: Verify AX scroll layout fix",
+            "status": "idle",
+            "createdAt": 1791570296000,
+            "updatedAt": 1791570296000,
+            "computerId": "00000000-0000-4000-8000-0000000000c0",
+            "messageCount": 84
+          },
+          {
+            "sessionId": "e3ab0936-0471-4d61-a891-c165291cb05a",
+            "parent_session_id": "bf552268-e102-4279-b38d-65fdd00b9e90",
+            "title": "Worker: Re-verify Phase 4 AX overflow fix",
+            "status": "idle",
+            "createdAt": 1791569616000,
+            "updatedAt": 1791569616000,
+            "computerId": "00000000-0000-4000-8000-0000000000c0",
+            "messageCount": 85
+          },
+          {
+            "sessionId": "7f3b4d93-a277-4156-8790-3bb16f5b4695",
+            "parent_session_id": "bf552268-e102-4279-b38d-65fdd00b9e90",
+            "title": "Worker: Verify Phase 4 accessibility visually",
+            "status": "idle",
+            "createdAt": 1791568811000,
+            "updatedAt": 1791568811000,
+            "computerId": "00000000-0000-4000-8000-0000000000c0",
+            "messageCount": 135
+          },
+          {
+            "sessionId": "38937c0f-9458-4bf2-bd70-4fa8a7df5364",
+            "parent_session_id": "bf552268-e102-4279-b38d-65fdd00b9e90",
+            "title": "Worker: Review Mac theme keyboard changes",
+            "status": "idle",
+            "createdAt": 1791567869000,
+            "updatedAt": 1791567869000,
+            "computerId": "00000000-0000-4000-8000-0000000000c0",
+            "messageCount": 46
+          },
+          {
+            "sessionId": "f4f5dbfa-2ee8-4861-b3bf-da1bb8baf3b6",
+            "parent_session_id": "bf552268-e102-4279-b38d-65fdd00b9e90",
+            "title": "Worker: Review HomeView reflow changes",
+            "status": "idle",
+            "createdAt": 1791567795000,
+            "updatedAt": 1791567795000,
+            "computerId": "00000000-0000-4000-8000-0000000000c0",
+            "messageCount": 18
+          },
+          {
+            "sessionId": "2c28c8e4-674a-44ff-979a-f2f3b581fae2",
+            "parent_session_id": "bf552268-e102-4279-b38d-65fdd00b9e90",
+            "title": "Worker: Review Watch theme changes",
+            "status": "idle",
+            "createdAt": 1791567780000,
+            "updatedAt": 1791567780000,
+            "computerId": "00000000-0000-4000-8000-0000000000c0",
+            "messageCount": 34
+          },
+          {
+            "sessionId": "074ea9ff-3c24-4930-8459-d1e2d50a865f",
+            "parent_session_id": "bf552268-e102-4279-b38d-65fdd00b9e90",
+            "title": "Worker: Review iPhone theme changes",
+            "status": "idle",
+            "createdAt": 1791567758000,
+            "updatedAt": 1791567758000,
+            "computerId": "00000000-0000-4000-8000-0000000000c0",
+            "messageCount": 26
+          },
+          {
+            "sessionId": "11187bad-afc9-4aa9-8731-c3266adc3892",
+            "parent_session_id": "bf552268-e102-4279-b38d-65fdd00b9e90",
+            "title": "Worker: Review Mac motion gating changes",
+            "status": "idle",
+            "createdAt": 1791567665000,
+            "updatedAt": 1791567665000,
+            "computerId": "00000000-0000-4000-8000-0000000000c0",
+            "messageCount": 22
+          },
+          {
+            "sessionId": "27b05adf-a2ed-440d-b6a7-21edc56d3501",
+            "parent_session_id": "bf552268-e102-4279-b38d-65fdd00b9e90",
+            "title": "Worker: Mac and Watch Phase 4 work",
+            "status": "idle",
+            "createdAt": 1791567420000,
+            "updatedAt": 1791567420000,
+            "computerId": "00000000-0000-4000-8000-0000000000c0",
+            "messageCount": 148
+          },
+          {
+            "sessionId": "65a20826-487f-4a33-9f71-f721d9eec3c0",
+            "parent_session_id": "bf552268-e102-4279-b38d-65fdd00b9e90",
+            "title": "Worker: iPhone Phase 4 accessibility work",
+            "status": "idle",
+            "createdAt": 1791567407000,
+            "updatedAt": 1791567407000,
+            "computerId": "00000000-0000-4000-8000-0000000000c0",
+            "messageCount": 82
+          },
+          {
+            "sessionId": "5fbd1c2f-f029-48b6-b213-99e5e21c6ab3",
+            "parent_session_id": "bf552268-e102-4279-b38d-65fdd00b9e90",
+            "title": "Worker: Review iPhone Continuity Changes",
+            "status": "idle",
+            "createdAt": 1791565640000,
+            "updatedAt": 1791565640000,
+            "computerId": "00000000-0000-4000-8000-0000000000c0",
+            "messageCount": 122
+          },
+          {
+            "sessionId": "727994ef-ca0f-4b16-906e-c2acdedf2c11",
+            "parent_session_id": "bf552268-e102-4279-b38d-65fdd00b9e90",
+            "title": "Worker: Review Mac Continuity Timeline",
+            "status": "idle",
+            "createdAt": 1791565392000,
+            "updatedAt": 1791565392000,
+            "computerId": "00000000-0000-4000-8000-0000000000c0",
+            "messageCount": 50
+          },
+          {
+            "sessionId": "e330565c-7f81-48d2-9e21-e57ecce108fc",
+            "parent_session_id": "bf552268-e102-4279-b38d-65fdd00b9e90",
+            "title": "Worker: Review Mac Access Scope Changes",
+            "status": "idle",
+            "createdAt": 1791565323000,
+            "updatedAt": 1791565323000,
+            "computerId": "00000000-0000-4000-8000-0000000000c0",
+            "messageCount": 78
+          },
+          {
+            "sessionId": "8c56165c-4123-473c-9c7b-68287b32cec8",
+            "parent_session_id": "bf552268-e102-4279-b38d-65fdd00b9e90",
+            "title": "Worker: Implement Mac Continuity Access UI",
+            "status": "idle",
+            "createdAt": 1791564919000,
+            "updatedAt": 1791564919000,
+            "computerId": "00000000-0000-4000-8000-0000000000c0",
+            "messageCount": 278
+          },
+          {
+            "sessionId": "d3220911-4122-45c7-8c01-b2f970ca6b5d",
+            "parent_session_id": "bf552268-e102-4279-b38d-65fdd00b9e90",
+            "title": "Worker: Implement iPhone Continuity UI",
+            "status": "idle",
+            "createdAt": 1791564205000,
+            "updatedAt": 1791564205000,
+            "computerId": "00000000-0000-4000-8000-0000000000c0",
+            "messageCount": 236
+          },
+          {
+            "sessionId": "5c679069-4726-4296-8305-90e63b0b0920",
+            "parent_session_id": "bf552268-e102-4279-b38d-65fdd00b9e90",
+            "title": "Worker: Inspect Simulator Relay Pairing",
+            "status": "idle",
+            "createdAt": 1791563245000,
+            "updatedAt": 1791563245000,
+            "computerId": "00000000-0000-4000-8000-0000000000c0",
+            "messageCount": 49
+          },
+          {
+            "sessionId": "46462fd5-ae66-45f6-99bd-f7c9b6a6d8a3",
+            "parent_session_id": "bf552268-e102-4279-b38d-65fdd00b9e90",
+            "title": "Worker: Verify Mac QR pairing end to end",
+            "status": "idle",
+            "createdAt": 1791561665000,
+            "updatedAt": 1791561665000,
+            "computerId": "00000000-0000-4000-8000-0000000000c0",
+            "messageCount": 182
+          },
+          {
+            "sessionId": "faab83bb-53a0-4254-9a0c-3f59151520b4",
+            "parent_session_id": "bf552268-e102-4279-b38d-65fdd00b9e90",
+            "title": "Worker: Simulator check phase 2 iPhone",
+            "status": "idle",
+            "createdAt": 1791559540000,
+            "updatedAt": 1791559540000,
+            "computerId": "00000000-0000-4000-8000-0000000000c0",
+            "messageCount": 284
+          },
+          {
+            "sessionId": "5e8fb9c4-456c-4667-9400-a2151f6d00a3",
+            "parent_session_id": "bf552268-e102-4279-b38d-65fdd00b9e90",
+            "title": "Worker: Fix phase 2 iPhone findings",
+            "status": "idle",
+            "createdAt": 1791559160000,
+            "updatedAt": 1791559160000,
+            "computerId": "00000000-0000-4000-8000-0000000000c0",
+            "messageCount": 95
+          },
+          {
+            "sessionId": "b3a3cb58-dd6a-47a9-bb68-3e8fd8c650d9",
+            "parent_session_id": "bf552268-e102-4279-b38d-65fdd00b9e90",
+            "title": "Worker: Fix phase 2 Mac review findings",
+            "status": "idle",
+            "createdAt": 1791558817000,
+            "updatedAt": 1791558817000,
+            "computerId": "00000000-0000-4000-8000-0000000000c0",
+            "messageCount": 96
+          },
+          {
+            "sessionId": "d4f73ffd-95e8-4bed-8cf7-c7fe81ac61fc",
+            "parent_session_id": "bf552268-e102-4279-b38d-65fdd00b9e90",
+            "title": "Worker: Review phase 2 iPhone changes",
+            "status": "idle",
+            "createdAt": 1791558551000,
+            "updatedAt": 1791558551000,
+            "computerId": "00000000-0000-4000-8000-0000000000c0",
+            "messageCount": 166
+          }
+        ],
+        "pagination": {
+          "nextCursor": "1791558551",
+          "hasMore": true
+        }
+      }
+    }
+  ]
+}

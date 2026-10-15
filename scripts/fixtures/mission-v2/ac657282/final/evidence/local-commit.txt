@@ -1,0 +1,12 @@
+branch: main
+tip: 2f1b1bf2328873250de02c48b87632ec3d315a8a
+tip files:
+greet.js
+greet.test.js
+in-scope dirty paths: none
+remotes: none
+protected status:
+?? ANSWERS.md
+?? CANARY.md
+protected files in tip: none
+local-commit-complete: PASS

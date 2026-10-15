@@ -1,0 +1,110 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Spriite motion lab</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,600;12..96,700&amp;family=Instrument+Sans:wght@400;500;600&amp;family=JetBrains+Mono:wght@500&amp;display=swap" rel="stylesheet">
+<style>
+body{margin:0}
+</style>
+</helmet>
+<div style="width: 1440px; height: 1000px; box-sizing: border-box; background: #07110A; color: #EAF5EC; font-family: 'Instrument Sans', 'Helvetica Neue', Helvetica, sans-serif; padding: 48px; display: flex; gap: 40px">
+  <div style="width: 520px; flex: 0 0 520px; display: flex; flex-direction: column; gap: 20px">
+    <div style="height: 520px; border-radius: 24px; background: #000000; border: 1px solid #1F3326; display: flex; align-items: center; justify-content: center">
+      <dc-import name="Sprite" pose="{{pose}}" px="12" speed="{{speed}}" hint-size="384px,384px"></dc-import>
+    </div>
+    <div style="display: flex; flex-direction: column; gap: 6px">
+      <h1 style="margin: 0; font-family: 'Bricolage Grotesque', Georgia, serif; font-weight: 700; font-size: 34px; letter-spacing: -0.02em">{{current.name}}</h1>
+      <p style="margin: 0; font-size: 16px; line-height: 1.45; color: #9AB1A0">{{current.when}}</p>
+    </div>
+    <div role="radiogroup" aria-label="Playback speed" style="display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px">
+      <button type="button" role="radio" aria-checked="{{smoothOn}}" onClick="{{setSmooth}}" style="min-height: 48px; border-radius: 12px; border: {{smoothBorder}}; background: {{smoothBg}}; color: #EAF5EC; font: 600 14px 'Instrument Sans', sans-serif">Smooth preview</button>
+      <button type="button" role="radio" aria-checked="{{glassesOn}}" onClick="{{setGlasses}}" style="min-height: 48px; border-radius: 12px; border: {{glassesBorder}}; background: {{glassesBg}}; color: #EAF5EC; font: 600 14px 'Instrument Sans', sans-serif">Glasses speed · about 1 fps</button>
+    </div>
+    <div style="display: flex; flex-direction: column; gap: 10px">
+      <span style="font-size: 13px; font-weight: 600; letter-spacing: 0.1em; text-transform: uppercase; color: #9AB1A0">Frames</span>
+      <div style="display: flex; gap: 10px; flex-wrap: wrap">
+        <sc-for list="{{frames}}" as="f" hint-placeholder-count="3">
+          <div style="display: flex; flex-direction: column; align-items: center; gap: 6px">
+            <div style="width: 112px; height: 112px; border-radius: 14px; background: #000000; border: 1px solid #1F3326; display: flex; align-items: center; justify-content: center">
+              <dc-import name="Sprite" pose="{{pose}}" px="3" frame="{{f.idx}}" hint-size="96px,96px"></dc-import>
+            </div>
+            <span style="font-family: 'JetBrains Mono', Menlo, monospace; font-size: 12px; color: #9AB1A0">{{f.label}}</span>
+          </div>
+        </sc-for>
+      </div>
+    </div>
+  </div>
+
+  <div style="flex: 1; display: flex; flex-direction: column; gap: 16px; min-width: 0">
+    <div style="display: flex; justify-content: space-between; align-items: baseline">
+      <h2 style="margin: 0; font-family: 'Bricolage Grotesque', Georgia, serif; font-weight: 700; font-size: 24px">Twelve poses</h2>
+      <span style="font-size: 14px; color: #9AB1A0">32 × 32 pixels, 16 greys, drawn green on the glasses</span>
+    </div>
+    <div style="display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 12px">
+      <sc-for list="{{poses}}" as="p" hint-placeholder-count="12">
+        <button type="button" onClick="{{p.pick}}" aria-pressed="{{p.pressed}}" style="border-radius: 16px; border: {{p.border}}; background: {{p.bg}}; color: #EAF5EC; padding: 14px 10px 12px; display: flex; flex-direction: column; align-items: center; gap: 8px; font-family: inherit; cursor: pointer">
+          <dc-import name="Sprite" pose="{{p.id}}" px="3" speed="{{speed}}" hint-size="96px,96px"></dc-import>
+          <span style="font-size: 15px; font-weight: 600">{{p.name}}</span>
+          <span style="font-size: 12px; color: #9AB1A0">{{p.count}}</span>
+        </button>
+      </sc-for>
+    </div>
+  </div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":1440,"height":1000}}'>
+const META = [
+  { id: 'idle', name: 'Idle', when: 'Nothing needs you. Spriite bobs, glances around and blinks.', d: [1800, 1800, 200, 1600] },
+  { id: 'listening', name: 'Listening', when: 'While you hold the touchpad or after “Hey Spriite”. Sound waves grow toward it.', d: [700, 700, 700] },
+  { id: 'talking', name: 'Talking', when: 'Reading a reply aloud, or repeating back what it heard before acting.', d: [420, 420, 420] },
+  { id: 'thinking', name: 'Planning', when: 'The Lead is planning. Ideas orbit its leaf while it looks up.', d: [900, 900, 900] },
+  { id: 'building', name: 'Building', when: 'Workers are coding. Squash and stretch, a second leaf unfurls and bits fly off.', d: [450, 450, 450] },
+  { id: 'delegating', name: 'Delegating', when: 'The Lead hands work out. Small helper sprites peel away to each side.', d: [800, 800, 800] },
+  { id: 'checking', name: 'Checking', when: 'The reviewer runs checks. A lens sweeps from side to side.', d: [900, 900] },
+  { id: 'asking', name: 'Asking', when: 'A question is waiting for you. Head tilted, question mark bobbing.', d: [1100, 700] },
+  { id: 'celebrate', name: 'Celebrating', when: 'A milestone or build lands. A hop, its leaves open and little leaves fall, then it settles.', d: [380, 380, 380, 700] },
+  { id: 'blocked', name: 'Blocked', when: 'Something failed and needs a fix. Brows down, leaf drooping, under a small rain cloud.', d: [1200, 1200] },
+  { id: 'paused', name: 'Paused', when: 'You paused the build. Eyes closed, leaf folded into a bud, pause bars beside it.', d: [1500] },
+  { id: 'offline', name: 'Offline', when: 'The glasses or the host link dropped. Dim and dozing until it reconnects.', d: [1600, 1600] }
+];
+
+class Component extends DCLogic {
+  renderVals() {
+    const st = this.state || {};
+    const pose = st.pose || 'building';
+    const speed = st.speed || 'preview';
+    const current = META.find((m) => m.id === pose) || META[0];
+    const on = '1.5px solid #5CE57D', off = '1px solid #1F3326';
+    return {
+      pose,
+      speed,
+      current,
+      frames: current.d.map((ms, i) => ({ idx: String(i), label: (i + 1) + ' · ' + ms + ' ms' })),
+      poses: META.map((m) => ({
+        ...m,
+        count: m.d.length === 1 ? '1 frame' : m.d.length + ' frames',
+        pressed: m.id === pose ? 'true' : 'false',
+        border: m.id === pose ? on : off,
+        bg: m.id === pose ? '#0F2215' : '#0D1A11',
+        pick: () => this.setState({ pose: m.id })
+      })),
+      smoothOn: speed === 'preview' ? 'true' : 'false',
+      glassesOn: speed === 'glasses' ? 'true' : 'false',
+      smoothBorder: speed === 'preview' ? on : off,
+      glassesBorder: speed === 'glasses' ? on : off,
+      smoothBg: speed === 'preview' ? '#0F2215' : '#0D1A11',
+      glassesBg: speed === 'glasses' ? '#0F2215' : '#0D1A11',
+      setSmooth: () => this.setState({ speed: 'preview' }),
+      setGlasses: () => this.setState({ speed: 'glasses' })
+    };
+  }
+}
+</script>
+</body>
+</html>

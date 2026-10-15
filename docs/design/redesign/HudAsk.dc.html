@@ -1,0 +1,45 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Glasses HUD · Question</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link href="https://fonts.googleapis.com/css2?family=Instrument+Sans:wght@400;500;600&amp;display=swap" rel="stylesheet">
+<style>
+body{margin:0}
+</style>
+</helmet>
+<div style="width: 1152px; height: 576px; box-sizing: border-box; background: #000000; color: #9DFFB0; font-family: 'Instrument Sans', 'Helvetica Neue', Helvetica, sans-serif; position: relative; overflow: hidden">
+  <div style="position: absolute; left: 48px; top: 28px; width: 1056px; height: 56px; display: flex; justify-content: space-between; align-items: center; font-size: 26px; font-weight: 600; letter-spacing: 0.1em; color: #5BC874">
+    <span>LEAD ASKS</span>
+    <span>ONBOARDING EMAILS</span>
+  </div>
+
+  <div style="position: absolute; left: 48px; top: 104px">
+    <dc-import name="Sprite" pose="asking" px="4" hint-size="128px,128px"></dc-import>
+  </div>
+
+  <div style="position: absolute; left: 224px; top: 108px; width: 880px">
+    <span style="font-size: 44px; font-weight: 600; line-height: 1.2; color: #B8FFC8">When should the welcome email go out?</span>
+  </div>
+
+  <div style="position: absolute; left: 48px; top: 264px; width: 1056px; display: flex; flex-direction: column; gap: 6px; font-size: 34px; font-weight: 600">
+    <span style="color: #B8FFC8; border: 2px solid #9DFFB0; border-radius: 10px; padding: 8px 20px">After they verify</span>
+    <span style="color: #5BC874; padding: 8px 22px">Right away</span>
+    <span style="color: #5BC874; padding: 8px 22px">Say something else</span>
+  </div>
+
+  <div style="position: absolute; left: 48px; top: 512px; width: 1056px; font-size: 26px; color: #3A8A4E">Swipe to choose · tap to send · also on your phone</div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":1152,"height":576}}'>
+class Component extends DCLogic {
+  renderVals() { return {}; }
+}
+</script>
+</body>
+</html>

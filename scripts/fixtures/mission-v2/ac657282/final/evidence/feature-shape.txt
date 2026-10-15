@@ -1,0 +1,6 @@
+named export: greet
+greet("Ada"): Hello, Ada!
+test runner: node:test
+exact assertion present: yes
+scripts.test: node --test
+feature-shape: PASS

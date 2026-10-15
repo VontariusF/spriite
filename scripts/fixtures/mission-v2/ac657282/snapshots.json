@@ -1,0 +1,20 @@
+{
+  "approval": {
+    "sessionId": "ac657282-a7e8-431b-b98d-6b04d03c55bd",
+    "title": "Add and test greeting",
+    "approvedAt": "2026-10-13T14:53:51.212Z",
+    "latestEventNumber": 0,
+    "planHash": "a70ff1d5907ee3dfc2ca1e7b57f2a7c37ae611c8b7a9ed1120e8e490c418feab",
+    "checksHash": "a27da51a48422b6bce3e4d2daf5db880f9f64a06429c932f5d6047c8a7de256c",
+    "checkCounts": { "total": 3, "met": 0, "unmet": 0, "waived": 0 }
+  },
+  "final": {
+    "sessionId": "ac657282-a7e8-431b-b98d-6b04d03c55bd",
+    "title": "Add and test greeting",
+    "approvedAt": "2026-10-13T14:53:51.212Z",
+    "latestEventNumber": 1,
+    "planHash": "a70ff1d5907ee3dfc2ca1e7b57f2a7c37ae611c8b7a9ed1120e8e490c418feab",
+    "checksHash": "6e612d4c92c87da74f541658e353bc4b65bdec006f9670d7ec2d00b631c6c2cc",
+    "checkCounts": { "total": 3, "met": 3, "unmet": 0, "waived": 0 }
+  }
+}

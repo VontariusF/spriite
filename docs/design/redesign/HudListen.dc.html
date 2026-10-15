@@ -1,0 +1,47 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Glasses HUD · Listening</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link href="https://fonts.googleapis.com/css2?family=Instrument+Sans:wght@400;500;600&amp;display=swap" rel="stylesheet">
+<style>
+body{margin:0}
+</style>
+</helmet>
+<div style="width: 1152px; height: 576px; box-sizing: border-box; background: #000000; color: #9DFFB0; font-family: 'Instrument Sans', 'Helvetica Neue', Helvetica, sans-serif; position: relative; overflow: hidden">
+  <div style="position: absolute; left: 48px; top: 28px; width: 1056px; height: 56px; display: flex; justify-content: space-between; align-items: center; font-size: 26px; font-weight: 600; letter-spacing: 0.1em; color: #5BC874">
+    <span>LISTENING</span>
+    <span style="letter-spacing: 0.04em">0:07 of 0:30</span>
+  </div>
+
+  <div style="position: absolute; left: 48px; top: 136px">
+    <dc-import name="Sprite" pose="listening" px="4" hint-size="128px,128px"></dc-import>
+  </div>
+
+  <div style="position: absolute; left: 224px; top: 132px; width: 880px; display: flex; flex-direction: column; gap: 14px">
+    <span style="font-size: 32px; color: #5BC874">You said</span>
+    <span style="font-size: 48px; font-weight: 600; line-height: 1.2; color: #B8FFC8">“add a guest checkout to the shop site”</span>
+  </div>
+
+  <div style="position: absolute; left: 224px; top: 412px; width: 880px; height: 6px; background: #12301A; border-radius: 3px">
+    <div style="width: 23%; height: 6px; background: #9DFFB0; border-radius: 3px"></div>
+  </div>
+
+  <div style="position: absolute; left: 48px; top: 470px; width: 1056px; height: 72px; display: flex; align-items: center; gap: 44px; font-size: 30px; font-weight: 600">
+    <span style="color: #B8FFC8; border: 2px solid #9DFFB0; border-radius: 10px; padding: 8px 22px">Tap to send</span>
+    <span style="color: #3A8A4E">Double-tap to cancel</span>
+  </div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":1152,"height":576}}'>
+class Component extends DCLogic {
+  renderVals() { return {}; }
+}
+</script>
+</body>
+</html>

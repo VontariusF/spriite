@@ -1,0 +1,81 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Spriite · Welcome</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,600;12..96,700&amp;family=Instrument+Sans:wght@400;500;600&amp;family=JetBrains+Mono:wght@500&amp;display=swap" rel="stylesheet">
+<style>
+body{margin:0}
+a{color:#5CE57D}a:hover{color:#8BF0A2}
+</style>
+</helmet>
+<div style="width: 390px; height: 844px; box-sizing: border-box; background: #07110A; color: #EAF5EC; font-family: 'Instrument Sans', 'Helvetica Neue', Helvetica, sans-serif; display: flex; flex-direction: column; padding: 28px 22px 26px; gap: 22px">
+  <div style="display: flex; align-items: center; justify-content: space-between">
+    <div style="font-family: 'Bricolage Grotesque', Georgia, serif; font-weight: 700; font-size: 20px; letter-spacing: -0.01em">Spriite</div>
+  </div>
+
+  <div style="display: flex; flex-direction: column; align-items: center; gap: 6px; padding-top: 6px">
+    <div style="width: 168px; height: 168px; border-radius: 84px; background: #0D1A11; border: 1px solid #1F3326; display: flex; align-items: center; justify-content: center">
+      <dc-import name="Sprite" pose="idle" px="4" hint-size="128px,128px"></dc-import>
+    </div>
+  </div>
+
+  <div style="display: flex; flex-direction: column; gap: 8px">
+    <h1 style="margin: 0; font-family: 'Bricolage Grotesque', Georgia, serif; font-weight: 700; font-size: 30px; line-height: 1.1; letter-spacing: -0.02em">Let’s get your glasses building.</h1>
+    <p style="margin: 0; font-size: 16px; line-height: 1.45; color: #9AB1A0">Choose how Spriite reaches Factory. Everything else can wait.</p>
+  </div>
+
+  <div style="display: flex; flex-direction: column; gap: 10px">
+    <a href="Pair.dc.html" style="text-decoration: none; color: #EAF5EC; background: #0F2215; border: 1.5px solid #5CE57D; border-radius: 16px; padding: 16px; display: flex; gap: 14px; align-items: flex-start">
+      <div style="width: 40px; height: 40px; flex: 0 0 40px; border-radius: 12px; background: #5CE57D; color: #04210E; display: flex; align-items: center; justify-content: center">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="4" width="18" height="12" rx="2"></rect><path d="M8 20h8M12 16v4"></path></svg>
+      </div>
+      <div style="display: flex; flex-direction: column; gap: 4px; flex: 1">
+        <div style="display: flex; align-items: center; gap: 8px; flex-wrap: wrap">
+          <span style="font-size: 16px; font-weight: 600">Pair with my Factory computer</span>
+          <span style="font-size: 11px; font-weight: 600; letter-spacing: 0.06em; text-transform: uppercase; color: #04210E; background: #5CE57D; border-radius: 6px; padding: 2px 6px">Best</span>
+        </div>
+        <span style="font-size: 14px; line-height: 1.4; color: #9AB1A0">Run one command where Factory runs. Your keys, repos and host link come over together.</span>
+      </div>
+    </a>
+
+    <a href="Repo.dc.html" style="text-decoration: none; color: #EAF5EC; background: #0D1A11; border: 1px solid #1F3326; border-radius: 16px; padding: 16px; display: flex; gap: 14px; align-items: flex-start">
+      <div style="width: 40px; height: 40px; flex: 0 0 40px; border-radius: 12px; background: #13241A; color: #7DBEFF; display: flex; align-items: center; justify-content: center">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="8" cy="15" r="4"></circle><path d="M11 12l9-9M17 6l3 3M15 8l2 2"></path></svg>
+      </div>
+      <div style="display: flex; flex-direction: column; gap: 4px; flex: 1">
+        <span style="font-size: 16px; font-weight: 600">Use my Factory key only</span>
+        <span style="font-size: 14px; line-height: 1.4; color: #9AB1A0">Paste one API key. Builds run in Factory’s cloud.</span>
+      </div>
+    </a>
+
+    <a href="Move.dc.html" style="text-decoration: none; color: #EAF5EC; background: #0D1A11; border: 1px solid #1F3326; border-radius: 16px; padding: 16px; display: flex; gap: 14px; align-items: flex-start">
+      <div style="width: 40px; height: 40px; flex: 0 0 40px; border-radius: 12px; background: #13241A; color: #BDA4FF; display: flex; align-items: center; justify-content: center">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="2" y="5" width="8" height="14" rx="2"></rect><rect x="14" y="5" width="8" height="14" rx="2"></rect><path d="M10 12h4M12.5 10.5L14 12l-1.5 1.5"></path></svg>
+      </div>
+      <div style="display: flex; flex-direction: column; gap: 4px; flex: 1">
+        <span style="font-size: 16px; font-weight: 600">Move from another phone</span>
+        <span style="font-size: 14px; line-height: 1.4; color: #9AB1A0">Bring every key and build over with a transfer code.</span>
+      </div>
+    </a>
+  </div>
+
+  <div style="margin-top: auto; display: flex; align-items: center; gap: 10px; color: #9AB1A0; font-size: 13px; line-height: 1.4">
+    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" style="flex: 0 0 18px"><rect x="4" y="11" width="16" height="10" rx="2"></rect><path d="M8 11V7a4 4 0 0 1 8 0v4"></path></svg>
+    <span>Secrets are encrypted end to end. The relay never sees them.</span>
+  </div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":390,"height":844}}'>
+class Component extends DCLogic {
+  renderVals() { return {}; }
+}
+</script>
+</body>
+</html>

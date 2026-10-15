@@ -1,0 +1,38 @@
+{
+  "source": "droid 0.238.0 live canary 2026-10-14 (raw-mission-238-v2tag.jsonl), trimmed",
+  "rootSessionId": "c46f721a-3202-4e17-9d24-85efe2878e37",
+  "agentSessionId": "7b9ae5c2-16b7-47fc-871f-3e5cd6ddc3c4",
+  "notes": [
+    "Texts clipped to 400 chars, tool inputs to 240; thinking blocks, deltas and token usage dropped; emails/names redacted.",
+    "Message ids are synthetic (fixture-msg-N); tool use ids, session ids, turn ids and timestamps are real.",
+    "The live run tagged the root via update_session_settings; initialize_session with tags returns the same settings.tags (probe-tags-238)."
+  ],
+  "initializeSettings": {
+    "modelId": "gpt-6.1-sol",
+    "reasoningEffort": "high",
+    "interactionMode": "mission",
+    "autonomyLevel": "high",
+    "availableAutonomyLevels": [
+      "off",
+      "low",
+      "medium",
+      "high"
+    ],
+    "compactionThresholdCheckEnabled": true,
+    "toolExecutionMode": "direct_only",
+    "allowSubagentsInScripts": false,
+    "additionalToolIds": [],
+    "enabledToolIds": [],
+    "disabledToolIds": [],
+    "restrictToolIds": [],
+    "tags": [
+      {
+        "name": "mission-v2",
+        "metadata": {
+          "kind": "orchestrator",
+          "missionId": "c46f721a-3202-4e17-9d24-85efe2878e37"
+        }
+      }
+    ]
+  }
+}

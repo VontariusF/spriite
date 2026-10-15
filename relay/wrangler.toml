@@ -1,0 +1,17 @@
+name = "spriite-relay"
+main = "worker.js"
+compatibility_date = "2026-09-01"
+
+# Optional: restrict which origins may read relayed responses.
+# [vars]
+# ALLOWED_ORIGINS = "*"
+
+# The pairing mailbox (relay/pair.mjs): one Durable Object holds the short-lived
+# ciphertext for `spriite pair` and "Move to another phone", so each code is
+# claimed exactly once. SQLite-backed, so it runs on the free plan too.
+[durable_objects]
+bindings = [{ name = "PAIR_MAILBOX", class_name = "PairMailbox" }]
+
+[[migrations]]
+tag = "pair-mailbox-v1"
+new_sqlite_classes = ["PairMailbox"]

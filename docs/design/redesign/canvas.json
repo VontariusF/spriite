@@ -1,0 +1,40 @@
+{
+  "v": 3,
+  "createdOnFiles": {"v": 1, "at": "2026-10-14T23:40:00Z"},
+  "title": "Spriite Redesign",
+  "launch": {"view": "canvas"},
+  "pages": [],
+  "boards": {
+    "SetupCompare.dc.html": {"x": 0, "y": 0, "w": 1200, "h": 900, "title": "Setup today vs. proposed"},
+    "Main.dc.html": {"x": 1280, "y": 0, "w": 390, "h": 844, "title": "1 · Welcome"},
+    "Pair.dc.html": {"x": 1750, "y": 0, "w": 390, "h": 900, "title": "2 · Pair with your Factory computer"},
+    "Paired.dc.html": {"x": 2220, "y": 0, "w": 390, "h": 900, "title": "3 · Review what came over"},
+    "Repo.dc.html": {"x": 2690, "y": 0, "w": 390, "h": 900, "title": "4 · Where builds go"},
+    "Ready.dc.html": {"x": 3160, "y": 0, "w": 390, "h": 900, "title": "5 · Ready"},
+    "Home.dc.html": {"x": 0, "y": 1280, "w": 390, "h": 1300, "title": "Home"},
+    "Mission.dc.html": {"x": 470, "y": 1280, "w": 390, "h": 1200, "title": "Build detail"},
+    "Ask.dc.html": {"x": 940, "y": 1280, "w": 390, "h": 844, "title": "Answering a question"},
+    "Settings.dc.html": {"x": 1410, "y": 1280, "w": 390, "h": 1150, "title": "Settings & connections"},
+    "Move.dc.html": {"x": 1880, "y": 1280, "w": 390, "h": 900, "title": "Move to another phone"},
+    "HudIdle.dc.html": {"x": 0, "y": 2960, "w": 1152, "h": 576, "title": "HUD · Idle (2x)"},
+    "HudListen.dc.html": {"x": 1232, "y": 2960, "w": 1152, "h": 576, "title": "HUD · Listening (2x)"},
+    "HudRun.dc.html": {"x": 2464, "y": 2960, "w": 1152, "h": 576, "title": "HUD · Building (2x)"},
+    "HudAsk.dc.html": {"x": 0, "y": 3656, "w": 1152, "h": 576, "title": "HUD · Question (2x)"},
+    "HudDone.dc.html": {"x": 1232, "y": 3656, "w": 1152, "h": 576, "title": "HUD · Done (2x)"},
+    "MotionLab.dc.html": {"x": 0, "y": 4612, "w": 1440, "h": 1000, "title": "Spriite motion lab", "is_interactive": true},
+    "Sprite.dc.html": {"x": 1520, "y": 4612, "w": 128, "h": 128, "title": "Sprite component", "is_interactive": true}
+  },
+  "order": [
+    "Main.dc.html", "SetupCompare.dc.html", "Pair.dc.html", "Paired.dc.html", "Repo.dc.html", "Ready.dc.html",
+    "Home.dc.html", "Mission.dc.html", "Ask.dc.html", "Settings.dc.html", "Move.dc.html",
+    "HudIdle.dc.html", "HudListen.dc.html", "HudRun.dc.html", "HudAsk.dc.html", "HudDone.dc.html",
+    "MotionLab.dc.html", "Sprite.dc.html"
+  ],
+  "notes": {
+    "row1": {"x": 0, "y": -260, "text": "Setup — three steps, nothing typed twice", "kind": "title1", "maxW": 3550},
+    "row2": {"x": 0, "y": 1020, "text": "Everyday use — one home screen", "kind": "title1", "maxW": 2270},
+    "row3": {"x": 0, "y": 2700, "text": "Glasses HUD — one idea per screen", "kind": "title1", "maxW": 3616},
+    "row5": {"x": 0, "y": 4352, "text": "Spriite motion — new character and poses", "kind": "title1", "maxW": 1650}
+  },
+  "designSystems": []
+}

@@ -1,0 +1,79 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Spriite · Answer a question</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,600;12..96,700&amp;family=Instrument+Sans:wght@400;500;600&amp;family=JetBrains+Mono:wght@500&amp;display=swap" rel="stylesheet">
+<style>
+body{margin:0}
+a{color:#5CE57D}a:hover{color:#8BF0A2}
+</style>
+</helmet>
+<div style="width: 390px; height: 844px; box-sizing: border-box; background: #030805; color: #EAF5EC; font-family: 'Instrument Sans', 'Helvetica Neue', Helvetica, sans-serif; display: flex; flex-direction: column; justify-content: flex-end">
+  <div role="dialog" aria-label="Lead asks a question" style="background: #0D1A11; border-top: 1px solid #24452F; border-radius: 24px 24px 0 0; padding: 10px 20px 24px; display: flex; flex-direction: column; gap: 16px">
+    <div style="width: 40px; height: 4px; border-radius: 2px; background: #2E4A37; align-self: center"></div>
+
+    <div style="display: flex; gap: 12px; align-items: center">
+      <dc-import name="Sprite" pose="asking" px="2" hint-size="64px,64px"></dc-import>
+      <div style="display: flex; flex-direction: column; gap: 2px">
+        <span style="font-size: 11px; font-weight: 700; letter-spacing: 0.12em; text-transform: uppercase; color: #F2B740">Lead asks</span>
+        <span style="font-size: 13px; color: #9AB1A0">Onboarding emails · 3 min ago</span>
+      </div>
+    </div>
+
+    <div style="display: flex; flex-direction: column; gap: 6px">
+      <h1 style="margin: 0; font-family: 'Bricolage Grotesque', Georgia, serif; font-weight: 700; font-size: 22px; line-height: 1.2; letter-spacing: -0.01em">When should the welcome email go out?</h1>
+      <p style="margin: 0; font-size: 14px; line-height: 1.45; color: #9AB1A0">Sending after verification avoids emails to typos, but adds a short delay.</p>
+    </div>
+
+    <div role="radiogroup" aria-label="Answer" style="display: flex; flex-direction: column; gap: 8px">
+      <sc-for list="{{options}}" as="o" hint-placeholder-count="3">
+        <button type="button" role="radio" aria-checked="{{o.checked}}" style="min-height: 56px; border-radius: 14px; border: {{o.border}}; background: {{o.bg}}; color: #EAF5EC; padding: 10px 14px; display: flex; gap: 12px; align-items: center; text-align: left; font-family: inherit">
+          <span style="width: 20px; height: 20px; flex: 0 0 20px; border-radius: 10px; box-sizing: border-box; border: 2px solid {{o.ring}}; display: flex; align-items: center; justify-content: center"><span style="width: 10px; height: 10px; border-radius: 5px; background: {{o.dot}}"></span></span>
+          <span style="display: flex; flex-direction: column; gap: 2px">
+            <span style="font-size: 15px; font-weight: 600">{{o.label}}</span>
+            <span style="font-size: 13px; color: #9AB1A0">{{o.hint}}</span>
+          </span>
+        </button>
+      </sc-for>
+    </div>
+
+    <div style="display: flex; gap: 8px">
+      <button type="button" style="flex: 0 0 auto; min-height: 52px; padding: 0 16px; border-radius: 14px; border: 1px solid #24452F; background: transparent; color: #EAF5EC; font: 600 15px 'Instrument Sans', sans-serif; display: flex; align-items: center; gap: 8px">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="9" y="3" width="6" height="11" rx="3"></rect><path d="M5 11a7 7 0 0 0 14 0M12 18v3"></path></svg>
+        Say it
+      </button>
+      <a href="Home.dc.html" style="flex: 1; min-height: 52px; border-radius: 14px; background: #5CE57D; color: #04210E; font-size: 16px; font-weight: 600; text-decoration: none; display: flex; align-items: center; justify-content: center">Send answer</a>
+    </div>
+    <span style="font-size: 12px; color: #9AB1A0; text-align: center">The same question is on your glasses. Answer either place.</span>
+  </div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":390,"height":844}}'>
+class Component extends DCLogic {
+  renderVals() {
+    const options = [
+      { label: 'After they verify', hint: 'Recommended by the Lead', on: true },
+      { label: 'Right away', hint: 'Fastest for new users' },
+      { label: 'Let me decide later', hint: 'The Lead keeps building around it' }
+    ];
+    return {
+      options: options.map((o) => ({
+        ...o,
+        checked: o.on ? 'true' : 'false',
+        border: o.on ? '1.5px solid #5CE57D' : '1px solid #1F3326',
+        bg: o.on ? '#0F2215' : '#07110A',
+        ring: o.on ? '#5CE57D' : '#5A7562',
+        dot: o.on ? '#5CE57D' : 'transparent'
+      }))
+    };
+  }
+}
+</script>
+</body>
+</html>

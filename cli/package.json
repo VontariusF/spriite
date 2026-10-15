@@ -1,0 +1,26 @@
+{
+  "name": "spriite",
+  "version": "0.3.2",
+  "description": "Pair Spriite (the voice-first companion for HUD smart glasses) with your Factory computer: npx spriite pair",
+  "license": "Apache-2.0",
+  "type": "module",
+  "bin": { "spriite": "bin/spriite.mjs" },
+  "engines": { "node": ">=22" },
+  "files": [
+    "bin/",
+    "lib/",
+    "broker/",
+    "scripts/install-native-broker.sh",
+    "README.md"
+  ],
+  "scripts": {
+    "prepack": "node tools/prepack.mjs",
+    "postpack": "node tools/prepack.mjs --clean",
+    "test": "node --import ../scripts/ts-resolve.mjs ../scripts/test-pairing.mjs"
+  },
+  "dependencies": {
+    "@noble/curves": "2.4.0",
+    "@noble/hashes": "2.4.0"
+  },
+  "keywords": ["spriite", "factory", "pairing", "smart-glasses"]
+}

@@ -1,0 +1,134 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Spriite · Home</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,600;12..96,700&amp;family=Instrument+Sans:wght@400;500;600&amp;family=JetBrains+Mono:wght@500&amp;display=swap" rel="stylesheet">
+<style>
+body{margin:0}
+a{color:#5CE57D}a:hover{color:#8BF0A2}
+textarea::placeholder{color:#7F9785}
+</style>
+</helmet>
+<div style="width: 390px; height: 1300px; box-sizing: border-box; background: #07110A; color: #EAF5EC; font-family: 'Instrument Sans', 'Helvetica Neue', Helvetica, sans-serif; display: flex; flex-direction: column">
+  <div style="flex: 1; display: flex; flex-direction: column; gap: 16px; padding: 18px 18px 24px">
+    <div style="display: flex; align-items: center; justify-content: space-between">
+      <div style="font-family: 'Bricolage Grotesque', Georgia, serif; font-weight: 700; font-size: 22px; letter-spacing: -0.01em">Spriite</div>
+      <span style="display: flex; align-items: center; gap: 6px; font-size: 13px; font-weight: 600; color: #5CE57D; background: #0F2215; border: 1px solid #24452F; border-radius: 999px; padding: 6px 12px">
+        <span style="width: 8px; height: 8px; border-radius: 4px; background: #5CE57D"></span>
+        Glasses on
+      </span>
+    </div>
+
+    <div style="background: #000000; border: 1px solid #1F3326; border-radius: 18px; padding: 16px; display: flex; flex-direction: column; gap: 14px">
+      <div style="display: flex; justify-content: space-between; align-items: center">
+        <span style="font-size: 11px; font-weight: 600; letter-spacing: 0.12em; text-transform: uppercase; color: #6FCF86">On your glasses</span>
+        <span style="font-size: 12px; color: #6FCF86">Milestone 2 of 4</span>
+      </div>
+      <div style="display: flex; gap: 14px; align-items: center">
+        <dc-import name="Sprite" pose="building" px="2" hint-size="64px,64px"></dc-import>
+        <div style="display: flex; flex-direction: column; gap: 4px; flex: 1">
+          <span style="font-size: 17px; font-weight: 600; color: #B8FFC8">Checkout flow</span>
+          <span style="font-size: 14px; line-height: 1.4; color: #8FE6A3">Two workers are wiring the cart API.</span>
+        </div>
+      </div>
+      <div aria-label="Progress: 2 milestones done, 1 in review, 1 to go" role="img" style="display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 4px">
+        <div style="height: 6px; border-radius: 3px; background: #5CE57D"></div>
+        <div style="height: 6px; border-radius: 3px; background: #5CE57D"></div>
+        <div style="height: 6px; border-radius: 3px; background: repeating-linear-gradient(90deg, #5CE57D 0 4px, transparent 4px 7px)"></div>
+        <div style="height: 6px; border-radius: 3px; background: #1A3322"></div>
+      </div>
+      <div style="display: flex; gap: 8px">
+        <a href="Mission.dc.html" style="flex: 1; min-height: 44px; border-radius: 10px; background: #13241A; color: #EAF5EC; font-size: 14px; font-weight: 600; text-decoration: none; display: flex; align-items: center; justify-content: center">Open build</a>
+        <button type="button" style="flex: 1; min-height: 44px; border-radius: 10px; border: 1px solid #24452F; background: transparent; color: #EAF5EC; font: 600 14px 'Instrument Sans', sans-serif">Pause</button>
+      </div>
+    </div>
+
+    <div style="background: #1E1705; border: 1.5px solid #F2B740; border-radius: 18px; padding: 16px; display: flex; flex-direction: column; gap: 12px">
+      <div style="display: flex; align-items: center; gap: 8px">
+        <span style="font-size: 11px; font-weight: 700; letter-spacing: 0.12em; text-transform: uppercase; color: #F2B740">Needs you</span>
+        <span style="font-size: 12px; color: #D9C7A0">Onboarding emails · Lead</span>
+      </div>
+      <span style="font-size: 16px; font-weight: 600; line-height: 1.35">Send the welcome email right away, or after the user verifies?</span>
+      <div style="display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px">
+        <button type="button" style="min-height: 44px; border-radius: 10px; border: 0; background: #F2B740; color: #2A1C00; font: 600 14px 'Instrument Sans', sans-serif">After verifying</button>
+        <button type="button" style="min-height: 44px; border-radius: 10px; border: 1px solid #6B5320; background: transparent; color: #FBE8C0; font: 600 14px 'Instrument Sans', sans-serif">Right away</button>
+      </div>
+      <a href="Ask.dc.html" style="font-size: 14px; font-weight: 600; color: #F2B740; text-decoration: none; min-height: 32px; display: flex; align-items: center">See all options</a>
+    </div>
+
+    <div style="background: #0D1A11; border: 1px solid #1F3326; border-radius: 18px; padding: 14px; display: flex; flex-direction: column; gap: 12px">
+      <label for="ask" style="font-size: 15px; font-weight: 600">Start something new</label>
+      <textarea id="ask" rows="3" placeholder="Add a guest checkout to the shop site…" style="resize: none; box-sizing: border-box; width: 100%; border-radius: 12px; border: 1px solid #24452F; background: #07110A; color: #EAF5EC; font: 16px/1.4 'Instrument Sans', sans-serif; padding: 12px"></textarea>
+      <div style="display: flex; align-items: center; gap: 8px; flex-wrap: wrap">
+        <button type="button" style="min-height: 36px; padding: 0 12px; border-radius: 999px; border: 1px solid #24452F; background: #13241A; color: #EAF5EC; font: 500 13px 'Instrument Sans', sans-serif; display: flex; align-items: center; gap: 6px">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M12 5v14M5 12h14"></path></svg>
+          New repo
+        </button>
+        <button type="button" style="min-height: 36px; padding: 0 12px; border-radius: 999px; border: 1px solid #24452F; background: transparent; color: #9AB1A0; font: 500 13px 'Instrument Sans', sans-serif">Factory default models</button>
+        <div style="flex: 1"></div>
+        <button type="button" aria-label="Talk" style="width: 44px; height: 44px; border-radius: 22px; border: 1px solid #24452F; background: transparent; color: #EAF5EC; display: flex; align-items: center; justify-content: center">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="9" y="3" width="6" height="11" rx="3"></rect><path d="M5 11a7 7 0 0 0 14 0M12 18v3"></path></svg>
+        </button>
+        <button type="button" aria-label="Send" style="width: 44px; height: 44px; border-radius: 22px; border: 0; background: #5CE57D; color: #04210E; display: flex; align-items: center; justify-content: center">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 19V5M5 12l7-7 7 7"></path></svg>
+        </button>
+      </div>
+    </div>
+
+    <div style="display: flex; flex-direction: column; gap: 10px">
+      <div style="display: flex; justify-content: space-between; align-items: baseline">
+        <h2 style="margin: 0; font-family: 'Bricolage Grotesque', Georgia, serif; font-size: 20px; font-weight: 700">Builds</h2>
+        <a href="#" style="font-size: 14px; font-weight: 600; text-decoration: none">See all</a>
+      </div>
+      <div style="background: #0D1A11; border: 1px solid #1F3326; border-radius: 18px; display: flex; flex-direction: column">
+        <sc-for list="{{builds}}" as="b" hint-placeholder-count="4">
+          <a href="Mission.dc.html" style="text-decoration: none; color: #EAF5EC; display: flex; gap: 12px; align-items: center; padding: 14px 16px; border-top: {{b.border}}">
+            <span style="width: 10px; height: 10px; flex: 0 0 10px; border-radius: 5px; background: {{b.dot}}"></span>
+            <span style="flex: 1; display: flex; flex-direction: column; gap: 3px; min-width: 0">
+              <span style="font-size: 15px; font-weight: 600">{{b.name}}</span>
+              <span style="font-size: 13px; color: #9AB1A0">{{b.status}}</span>
+            </span>
+            <span style="font-size: 12px; font-weight: 600; color: {{b.srcColor}}; border: 1px solid {{b.srcColor}}; border-radius: 6px; padding: 2px 6px">{{b.src}}</span>
+          </a>
+        </sc-for>
+      </div>
+    </div>
+  </div>
+
+  <nav aria-label="Main" style="border-top: 1px solid #1F3326; background: #0A150D; display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); padding: 6px 8px 14px">
+    <a href="Home.dc.html" aria-current="page" style="min-height: 52px; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 3px; color: #5CE57D; font-size: 12px; font-weight: 600; text-decoration: none">
+      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 11l9-7 9 7v9a1 1 0 0 1-1 1h-5v-6h-6v6H4a1 1 0 0 1-1-1z"></path></svg>
+      Home
+    </a>
+    <a href="Mission.dc.html" style="min-height: 52px; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 3px; color: #9AB1A0; font-size: 12px; font-weight: 600; text-decoration: none">
+      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="4" width="18" height="16" rx="2"></rect><path d="M7 9h10M7 13h6"></path></svg>
+      Builds
+    </a>
+    <a href="Settings.dc.html" style="min-height: 52px; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 3px; color: #9AB1A0; font-size: 12px; font-weight: 600; text-decoration: none">
+      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="3"></circle><path d="M19.4 15a1.7 1.7 0 0 0 .3 1.8l.1.1a2 2 0 1 1-2.8 2.8l-.1-.1a1.7 1.7 0 0 0-1.8-.3 1.7 1.7 0 0 0-1 1.5V21a2 2 0 1 1-4 0v-.1a1.7 1.7 0 0 0-1.1-1.5 1.7 1.7 0 0 0-1.8.3l-.1.1a2 2 0 1 1-2.8-2.8l.1-.1a1.7 1.7 0 0 0 .3-1.8 1.7 1.7 0 0 0-1.5-1H3a2 2 0 1 1 0-4h.1a1.7 1.7 0 0 0 1.5-1.1 1.7 1.7 0 0 0-.3-1.8l-.1-.1a2 2 0 1 1 2.8-2.8l.1.1a1.7 1.7 0 0 0 1.8.3H9a1.7 1.7 0 0 0 1-1.5V3a2 2 0 1 1 4 0v.1a1.7 1.7 0 0 0 1 1.5 1.7 1.7 0 0 0 1.8-.3l.1-.1a2 2 0 1 1 2.8 2.8l-.1.1a1.7 1.7 0 0 0-.3 1.8V9a1.7 1.7 0 0 0 1.5 1H21a2 2 0 1 1 0 4h-.1a1.7 1.7 0 0 0-1.5 1z"></path></svg>
+      Settings
+    </a>
+  </nav>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":390,"height":1300}}'>
+class Component extends DCLogic {
+  renderVals() {
+    const builds = [
+      { name: 'Checkout flow', status: 'Building · 3 agents · milestone 2 of 4', dot: '#5CE57D', src: 'Spriite', srcColor: '#5CE57D' },
+      { name: 'Onboarding emails', status: 'Waiting for your answer', dot: '#F2B740', src: 'Spriite', srcColor: '#5CE57D' },
+      { name: 'Pricing page copy', status: 'Watching · started in Factory', dot: '#7DBEFF', src: 'Factory', srcColor: '#7DBEFF' },
+      { name: 'Landing page', status: 'Done · pull request ready', dot: '#5A7562', src: 'Cursor', srcColor: '#BDA4FF' }
+    ];
+    return { builds: builds.map((b, i) => ({ ...b, border: i ? '1px solid #1F3326' : '0' })) };
+  }
+}
+</script>
+</body>
+</html>

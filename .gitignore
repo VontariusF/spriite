@@ -1,0 +1,40 @@
+# Logs
+logs
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+lerna-debug.log*
+
+node_modules
+dist
+dist-ssr
+*.local
+
+# Editor directories and files
+.vscode/*
+!.vscode/extensions.json
+.idea
+.DS_Store
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.sw?
+
+# Spriite build artifacts
+*.ehpk
+.pack
+.env*.local
+
+# Owner-supplied X credentials (never ship or commit)
+Spriite-X-Token*.json
+# the owners private VPS archive db, never in the repo
+relay/spriite-archive.db*
+
+# Local walkthrough evidence (screenshots), kept out of git
+.screenshots/
+
+# Local simulator/redesign test captures, kept out of git
+shots/redesign-test/

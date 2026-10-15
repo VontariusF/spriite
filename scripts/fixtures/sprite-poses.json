@@ -1,0 +1,314 @@
+{
+  "idle": {
+    "name": "Idle",
+    "key": "idle.0",
+    "loop": true,
+    "steps": [
+      {
+        "frame": "idle.0",
+        "d": 1800,
+        "holdMs": 1800
+      },
+      {
+        "frame": "idle.1",
+        "d": 1800,
+        "holdMs": 1800
+      },
+      {
+        "frame": "idle.2",
+        "d": 200,
+        "holdMs": 1000
+      },
+      {
+        "frame": "idle.3",
+        "d": 1600,
+        "holdMs": 1600
+      }
+    ],
+    "staticPixels": "fd61f77b35b27a79",
+    "framePixels": [
+      "fd61f77b35b27a79",
+      "e929878d09c614b1",
+      "f319637936555c66",
+      "75ffd4833554e3d8"
+    ]
+  },
+  "listening": {
+    "name": "Listening",
+    "key": "listening.0",
+    "loop": true,
+    "steps": [
+      {
+        "frame": "listening.0",
+        "d": 700,
+        "holdMs": 1000
+      },
+      {
+        "frame": "listening.1",
+        "d": 700,
+        "holdMs": 1000
+      },
+      {
+        "frame": "listening.2",
+        "d": 700,
+        "holdMs": 1000
+      }
+    ],
+    "staticPixels": "3a9bf1c703c64e29",
+    "framePixels": [
+      "3a9bf1c703c64e29",
+      "aec9977c91572f82",
+      "4cb9be95a55c0999"
+    ]
+  },
+  "talking": {
+    "name": "Talking",
+    "key": "talking.0",
+    "loop": true,
+    "steps": [
+      {
+        "frame": "talking.0",
+        "d": 420,
+        "holdMs": 1000
+      },
+      {
+        "frame": "talking.1",
+        "d": 420,
+        "holdMs": 1000
+      },
+      {
+        "frame": "talking.2",
+        "d": 420,
+        "holdMs": 1000
+      }
+    ],
+    "staticPixels": "427bf8ba379979cd",
+    "framePixels": [
+      "427bf8ba379979cd",
+      "57cb72c11505e60b",
+      "3038143b5925845f"
+    ]
+  },
+  "thinking": {
+    "name": "Planning",
+    "key": "thinking.0",
+    "loop": true,
+    "steps": [
+      {
+        "frame": "thinking.0",
+        "d": 900,
+        "holdMs": 1000
+      },
+      {
+        "frame": "thinking.1",
+        "d": 900,
+        "holdMs": 1000
+      },
+      {
+        "frame": "thinking.2",
+        "d": 900,
+        "holdMs": 1000
+      }
+    ],
+    "staticPixels": "70dbbc35fc4115cd",
+    "framePixels": [
+      "70dbbc35fc4115cd",
+      "890938060365e073",
+      "4ea01b3e65327531"
+    ]
+  },
+  "building": {
+    "name": "Building",
+    "key": "building.0",
+    "loop": true,
+    "steps": [
+      {
+        "frame": "building.0",
+        "d": 450,
+        "holdMs": 1000
+      },
+      {
+        "frame": "building.1",
+        "d": 450,
+        "holdMs": 1000
+      },
+      {
+        "frame": "building.2",
+        "d": 450,
+        "holdMs": 1000
+      }
+    ],
+    "staticPixels": "ee29085fd62a9be3",
+    "framePixels": [
+      "ee29085fd62a9be3",
+      "c33561093cf045ca",
+      "3c65f08aa0a1517f"
+    ]
+  },
+  "delegating": {
+    "name": "Delegating",
+    "key": "delegating.0",
+    "loop": true,
+    "steps": [
+      {
+        "frame": "delegating.0",
+        "d": 800,
+        "holdMs": 1000
+      },
+      {
+        "frame": "delegating.1",
+        "d": 800,
+        "holdMs": 1000
+      },
+      {
+        "frame": "delegating.2",
+        "d": 800,
+        "holdMs": 1000
+      }
+    ],
+    "staticPixels": "94d54bd12ef0cfb9",
+    "framePixels": [
+      "94d54bd12ef0cfb9",
+      "74dda7b9f326b4b1",
+      "1df32320a9c30b43"
+    ]
+  },
+  "checking": {
+    "name": "Checking",
+    "key": "checking.0",
+    "loop": true,
+    "steps": [
+      {
+        "frame": "checking.0",
+        "d": 900,
+        "holdMs": 1000
+      },
+      {
+        "frame": "checking.1",
+        "d": 900,
+        "holdMs": 1000
+      }
+    ],
+    "staticPixels": "1fd48582b04d8ab3",
+    "framePixels": [
+      "1fd48582b04d8ab3",
+      "12ebd0bb346eaa09"
+    ]
+  },
+  "asking": {
+    "name": "Asking",
+    "key": "asking.0",
+    "loop": true,
+    "steps": [
+      {
+        "frame": "asking.0",
+        "d": 1100,
+        "holdMs": 1100
+      },
+      {
+        "frame": "asking.1",
+        "d": 700,
+        "holdMs": 1000
+      }
+    ],
+    "staticPixels": "5521a398fc170bd7",
+    "framePixels": [
+      "5521a398fc170bd7",
+      "f1debb0cbfcd1d2d"
+    ]
+  },
+  "celebrate": {
+    "name": "Celebrating",
+    "key": "celebrate.0",
+    "loop": true,
+    "steps": [
+      {
+        "frame": "celebrate.0",
+        "d": 380,
+        "holdMs": 1000
+      },
+      {
+        "frame": "celebrate.1",
+        "d": 380,
+        "holdMs": 1000
+      },
+      {
+        "frame": "celebrate.2",
+        "d": 380,
+        "holdMs": 1000
+      },
+      {
+        "frame": "celebrate.3",
+        "d": 700,
+        "holdMs": 1000
+      }
+    ],
+    "staticPixels": "e143664ca2be9e41",
+    "framePixels": [
+      "e143664ca2be9e41",
+      "17e1ffba2bd455bb",
+      "5092e8f07ae285c4",
+      "959d1856dbda4ca7"
+    ]
+  },
+  "blocked": {
+    "name": "Blocked",
+    "key": "blocked.0",
+    "loop": true,
+    "steps": [
+      {
+        "frame": "blocked.0",
+        "d": 1200,
+        "holdMs": 1200
+      },
+      {
+        "frame": "blocked.1",
+        "d": 1200,
+        "holdMs": 1200
+      }
+    ],
+    "staticPixels": "decd88038d632867",
+    "framePixels": [
+      "decd88038d632867",
+      "0a183fa584a0095b"
+    ]
+  },
+  "paused": {
+    "name": "Paused",
+    "key": "paused.0",
+    "loop": true,
+    "steps": [
+      {
+        "frame": "paused.0",
+        "d": 1500,
+        "holdMs": 1500
+      }
+    ],
+    "staticPixels": "e42de28d039e79d5",
+    "framePixels": [
+      "e42de28d039e79d5"
+    ]
+  },
+  "offline": {
+    "name": "Offline",
+    "key": "offline.0",
+    "loop": true,
+    "steps": [
+      {
+        "frame": "offline.0",
+        "d": 1600,
+        "holdMs": 1600
+      },
+      {
+        "frame": "offline.1",
+        "d": 1600,
+        "holdMs": 1600
+      }
+    ],
+    "staticPixels": "c2ebd24fea2c46c6",
+    "framePixels": [
+      "c2ebd24fea2c46c6",
+      "ff31ffb1a96e752a"
+    ]
+  }
+}

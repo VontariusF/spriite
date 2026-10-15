@@ -1,0 +1,17 @@
+{
+  "name": "@spriite/native-broker",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "engines": { "node": ">=22" },
+  "exports": {
+    ".": { "types": "./index.d.ts", "default": "./index.mjs" },
+    "./sdk": { "types": "./sdk-adapter.ts", "default": "./sdk-adapter.ts" }
+  },
+  "scripts": {
+    "test": "node ../scripts/test-native-broker.mjs",
+    "start": "node server.mjs"
+  },
+  "peerDependencies": { "@factory/droid-sdk": "0.9.1" },
+  "peerDependenciesMeta": { "@factory/droid-sdk": { "optional": true } }
+}

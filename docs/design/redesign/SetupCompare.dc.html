@@ -1,0 +1,87 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Setup today vs. proposed</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,600;12..96,700&amp;family=Instrument+Sans:wght@400;500;600&amp;family=JetBrains+Mono:wght@500&amp;display=swap" rel="stylesheet">
+<style>
+body{margin:0}
+</style>
+</helmet>
+<div style="width: 1200px; height: 900px; box-sizing: border-box; background: #07110A; color: #EAF5EC; font-family: 'Instrument Sans', 'Helvetica Neue', Helvetica, sans-serif; padding: 56px; display: flex; flex-direction: column; gap: 36px">
+  <div style="display: flex; flex-direction: column; gap: 10px; max-width: 760px">
+    <div style="font-size: 12px; font-weight: 600; letter-spacing: 0.12em; text-transform: uppercase; color: #5CE57D">Why setup changes</div>
+    <h1 style="margin: 0; font-family: 'Bricolage Grotesque', Georgia, serif; font-weight: 700; font-size: 44px; line-height: 1.05; letter-spacing: -0.02em">Your Factory computer already knows your keys. Let it hand them over.</h1>
+  </div>
+
+  <div style="display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 28px; flex: 1">
+    <div style="background: #0D1A11; border: 1px solid #1F3326; border-radius: 20px; padding: 28px; display: flex; flex-direction: column; gap: 16px">
+      <div style="display: flex; justify-content: space-between; align-items: baseline">
+        <h2 style="margin: 0; font-family: 'Bricolage Grotesque', Georgia, serif; font-size: 24px; font-weight: 700">Today</h2>
+        <span style="font-size: 14px; color: #9AB1A0">13 steps · 4 places</span>
+      </div>
+      <div style="display: flex; flex-direction: column; gap: 9px; font-size: 15px; line-height: 1.35">
+        <div style="display: flex; gap: 12px"><span style="width: 92px; flex: 0 0 92px; color: #9AB1A0">Terminal</span><span>Clone, install, deploy the relay, pack</span></div>
+        <div style="display: flex; gap: 12px"><span style="width: 92px; flex: 0 0 92px; color: #9AB1A0">Even Hub</span><span>Create a project, upload, install</span></div>
+        <div style="display: flex; gap: 12px"><span style="width: 92px; flex: 0 0 92px; color: #9AB1A0">Host</span><span>Keep a Droid Computer online, run the broker installer</span></div>
+        <div style="display: flex; gap: 12px"><span style="width: 92px; flex: 0 0 92px; color: #9AB1A0">Phone</span><span>Factory key, then GitHub or Cursor key just to pick a repo, then voice, X token JSON, archive key, about 30 Factory-native fields</span></div>
+      </div>
+      <div style="height: 1px; background: #1F3326"></div>
+      <div style="display: flex; flex-direction: column; gap: 10px">
+        <div style="font-size: 12px; font-weight: 600; letter-spacing: 0.1em; text-transform: uppercase; color: #FF8A7A">What hurts</div>
+        <div style="display: flex; flex-direction: column; gap: 8px; font-size: 15px; line-height: 1.35; color: #D4E3D7">
+          <div>The required repo step is blocked by keys marked optional.</div>
+          <div>The Factory key, repo and models are each entered two or three times.</div>
+          <div>Host output gets copied into the phone by hand.</div>
+          <div>The Factory-native form sits on the Now tab, full of protocol words.</div>
+          <div>A new phone means doing all of it again.</div>
+        </div>
+      </div>
+    </div>
+
+    <div style="background: #0F2215; border: 1.5px solid #5CE57D; border-radius: 20px; padding: 28px; display: flex; flex-direction: column; gap: 16px">
+      <div style="display: flex; justify-content: space-between; align-items: baseline">
+        <h2 style="margin: 0; font-family: 'Bricolage Grotesque', Georgia, serif; font-size: 24px; font-weight: 700">Proposed</h2>
+        <span style="font-size: 14px; color: #9AB1A0">3 steps · 1 command</span>
+      </div>
+      <div style="display: flex; flex-direction: column; gap: 14px">
+        <div style="display: flex; gap: 14px; align-items: flex-start">
+          <span style="width: 30px; height: 30px; flex: 0 0 30px; border-radius: 15px; background: #5CE57D; color: #04210E; font-weight: 700; display: flex; align-items: center; justify-content: center">1</span>
+          <div style="display: flex; flex-direction: column; gap: 3px"><span style="font-size: 16px; font-weight: 600">Install Spriite on the glasses</span><span style="font-size: 14px; color: #9AB1A0; line-height: 1.4">From Even Hub. Self-hosters still bring their own relay at build time.</span></div>
+        </div>
+        <div style="display: flex; gap: 14px; align-items: flex-start">
+          <span style="width: 30px; height: 30px; flex: 0 0 30px; border-radius: 15px; background: #5CE57D; color: #04210E; font-weight: 700; display: flex; align-items: center; justify-content: center">2</span>
+          <div style="display: flex; flex-direction: column; gap: 6px"><span style="font-size: 16px; font-weight: 600">Pair with your Factory computer</span><span style="font-family: 'JetBrains Mono', Menlo, monospace; font-size: 14px; background: #07110A; border: 1px solid #1F3326; border-radius: 8px; padding: 8px 10px; align-self: flex-start">npx spriite pair</span><span style="font-size: 14px; color: #9AB1A0; line-height: 1.4">Reads the Factory login, GitHub CLI, Droid computer and host link. Shows a short code. You type the code on the phone and everything comes over encrypted.</span></div>
+        </div>
+        <div style="display: flex; gap: 14px; align-items: flex-start">
+          <span style="width: 30px; height: 30px; flex: 0 0 30px; border-radius: 15px; background: #5CE57D; color: #04210E; font-weight: 700; display: flex; align-items: center; justify-content: center">3</span>
+          <div style="display: flex; flex-direction: column; gap: 3px"><span style="font-size: 16px; font-weight: 600">Choose where builds go</span><span style="font-size: 14px; color: #9AB1A0; line-height: 1.4">A new repo per idea, or one you pick or paste. Never blocked by another key.</span></div>
+        </div>
+      </div>
+      <div style="height: 1px; background: #24452F"></div>
+      <div style="display: flex; flex-direction: column; gap: 10px">
+        <div style="font-size: 12px; font-weight: 600; letter-spacing: 0.1em; text-transform: uppercase; color: #5CE57D">What changes</div>
+        <div style="display: flex; flex-direction: column; gap: 8px; font-size: 15px; line-height: 1.35; color: #D4E3D7">
+          <div>No secret is typed on the phone. Voice and X connect from the computer too.</div>
+          <div>One home screen: glasses mirror, one composer, what needs you.</div>
+          <div>Factory-native details move to Settings › Advanced.</div>
+          <div>Key-only users get the same flow, minus the computer step.</div>
+          <div>New phone: one transfer code moves keys, defaults and history.</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":1200,"height":900}}'>
+class Component extends DCLogic {
+  renderVals() { return {}; }
+}
+</script>
+</body>
+</html>
